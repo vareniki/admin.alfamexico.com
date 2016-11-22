@@ -103,7 +103,8 @@ class AppController extends Controller {
 				'is_agencia' => $this->isAgencia(),
 				'is_agente' => $this->isAgente(),
 				'is_coordinador' => $this->isCoordinador(),
-				'is_consultor' => $this->isConsultor()));
+				'is_consultor' => $this->isConsultor(),
+				'is_editor' => $this->isEditor()));
 	}
 
 	/*
@@ -216,6 +217,11 @@ class AppController extends Controller {
 	protected function isCoordinador() {
 		$user = $this->Session->read('user');
 		return !is_null($user['agente_id'])	&& $user['Agente']['tipo'] == 'o';
+	}
+
+	protected function isEditor() {
+		$user = $this->Session->read('user');
+		return !is_null($user['agente_id'])	&& $user['Agente']['tipo'] == 'e';
 	}
 
 }
