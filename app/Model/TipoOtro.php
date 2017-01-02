@@ -4,8 +4,8 @@
 
 class TipoOtro extends AppModel {
 
-  public $name = 'TipoOtro';
-  public $useTable = 'taux_tipos_otro';
-  public $displayField = 'description';
+	public $name = 'TipoOtro';
+	public $useTable = 'taux_tipos_otro';
+	public $displayField = 'description';
 
 }

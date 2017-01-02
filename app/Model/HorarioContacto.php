@@ -9,8 +9,8 @@
  */
 class HorarioContacto extends AppModel {
 
-  public $name = 'HorarioContacto';
-  public $useTable = 'taux_horarios_contacto';
-  public $displayField = 'description';
+	public $name = 'HorarioContacto';
+	public $useTable = 'taux_horarios_contacto';
+	public $displayField = 'description';
 
 }

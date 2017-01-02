@@ -88,7 +88,15 @@ class ModelHelper extends Helper {
     $tag = isset($options['tag']) ? $options['tag'] : 'li';
 		$places = isset($options['places']) ? $options['places'] : 0;
 
-		$moneda =  (isset($info['TipoMoneda']['symbol'])) ? $info['TipoMoneda']['symbol'] : '&euro;';
+		if ($model != 'expression' && isset($options['currency']) && $options['currency'] == 'local') {
+		  if (isset($info[$model]['TipoMoneda']['symbol'])) {
+        $moneda = $info[$model]['TipoMoneda']['symbol'];
+      }
+    }
+
+    if (!isset($moneda) || empty($moneda)) {
+      $moneda =  (isset($info['TipoMoneda']['symbol'])) ? $info['TipoMoneda']['symbol'] : '&euro;';
+    }
 
     if (!is_array($campos)) {
       $campos = array($campos);

@@ -291,33 +291,58 @@ class InmueblesInfoComponent extends SessionComponent {
 		}
 
 		// Cambio en la dirección (35)
-		if (($info['Inmueble']['nombre_calle'] <> $lastInfo['Inmueble']['nombre_calle'])
-			|| ($info['Inmueble']['numero_calle'] <> $lastInfo['Inmueble']['numero_calle'])) {
+    if ( $info['Inmueble']['nombre_calle'] <> $lastInfo['Inmueble']['nombre_calle']
+         || $info['Inmueble']['numero_calle'] <> $lastInfo['Inmueble']['numero_calle']
+         || $info['Inmueble']['codigo_postal'] <> $lastInfo['Inmueble']['codigo_postal']
+         || $info['Inmueble']['poblacion'] <> $lastInfo['Inmueble']['poblacion']
+         || $info['Inmueble']['provincia'] <> $lastInfo['Inmueble']['provincia']
+         || $info['Inmueble']['ciudad'] <> $lastInfo['Inmueble']['ciudad']
+    ) {
 
-			$calle1 = $info['Inmueble']['nombre_calle'];
-			if (!empty($info['Inmueble']['numero_calle'])) {
-				$calle1 .= ', ' . $info['Inmueble']['numero_calle'];
-			}
+      $calle1 = $info['Inmueble']['nombre_calle'];
+      if ( ! empty( $info['Inmueble']['numero_calle'] ) ) {
+        $calle1 .= ', ' . $info['Inmueble']['numero_calle'];
+      }
 
-			$calle2 = $lastInfo['Inmueble']['nombre_calle'];
-			if (!empty($lastInfo['Inmueble']['numero_calle'])) {
-				$calle2 .= ', ' . $lastInfo['Inmueble']['numero_calle'];
-			}
+      $calle2 = $lastInfo['Inmueble']['nombre_calle'];
+      if ( ! empty( $lastInfo['Inmueble']['numero_calle'] ) ) {
+        $calle2 .= ', ' . $lastInfo['Inmueble']['numero_calle'];
+      }
 
-			$result[] = array(
-				'fecha' => date('Y-m-d H:i:s'),
-				'tipo_evento_id' => 35,
-				'inmueble_id' => $info['Inmueble']['id'],
-				'texto' => $calle1,
-				'texto2' => $calle2,
-				'agente_id' => $agente_id,
-				'agencia_id' => $agencia_id
-			);
-		}
+      if ($info['Inmueble']['ciudad'] <> $lastInfo['Inmueble']['ciudad'])
+      {
+        $calle1 .= ' - ' . $info['Inmueble']['ciudad'];
+        $calle2 .= ' - ' . $lastInfo['Inmueble']['ciudad'];
+      }
+
+      if ($info['Inmueble']['codigo_postal'] <> $lastInfo['Inmueble']['codigo_postal']
+          || $info['Inmueble']['poblacion'] <> $lastInfo['Inmueble']['poblacion']
+          || $info['Inmueble']['provincia'] <> $lastInfo['Inmueble']['provincia'])
+      {
+        $calle1 .= ' (' . $info['Inmueble']['codigo_postal'] . ' - ' . $info['Inmueble']['poblacion'] . ' - ' . $info['Inmueble']['provincia'] . ')';
+        $calle2 .= ' (' . $lastInfo['Inmueble']['codigo_postal'] . ' - ' . $lastInfo['Inmueble']['poblacion'] . ' - ' . $lastInfo['Inmueble']['provincia'] . ')';
+      }
+
+      $result[] = array(
+          'fecha'          => date( 'Y-m-d H:i:s' ),
+          'tipo_evento_id' => 35,
+          'inmueble_id'    => $info['Inmueble']['id'],
+          'texto'          => $calle1,
+          'texto2'         => $calle2,
+          'agente_id'      => $agente_id,
+          'agencia_id'     => $agencia_id
+      );
+    }
 
 		// Cambio en honorarios (37)
 		if (!empty($info['Inmueble']['honor_agencia']) && !empty($lastInfo['Inmueble']['honor_agencia'])
 			&& $info['Inmueble']['honor_agencia'] <> $lastInfo['Inmueble']['honor_agencia']) {
+
+	    if ($info['Inmueble']['honor_agencia_unid'] == 'e') {
+	      $moneda = $lastInfo['TipoMoneda']['symbol'];
+      } else {
+	      $moneda = '%';
+      }
 
 			$result[] = array(
 				'fecha' => date('Y-m-d H:i:s'),
@@ -325,7 +350,7 @@ class InmueblesInfoComponent extends SessionComponent {
 				'inmueble_id' => $info['Inmueble']['id'],
 				'numero' => (int) $info['Inmueble']['honor_agencia'],
 				'numero2' => (int) $lastInfo['Inmueble']['honor_agencia'],
-				'texto' => $info['Inmueble']['honor_agencia_unid'],
+				'texto' => $moneda,
 				'agente_id' => $agente_id,
 				'agencia_id' => $agencia_id
 			);

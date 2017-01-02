@@ -9,6 +9,7 @@ class Demanda extends AppModel {
 	public $hasOne = 'Demandante';
 
 	public $belongsTo = array(
-		'TipoInmueble' => array('foreignKey' => 'tipo'),
-		'EstadoConservacion' => array('foreignKey' => 'estado_conservacion'));
+			'TipoInmueble'       => array( 'foreignKey' => 'tipo' ),
+			'EstadoConservacion' => array( 'foreignKey' => 'estado_conservacion' )
+	);
 }

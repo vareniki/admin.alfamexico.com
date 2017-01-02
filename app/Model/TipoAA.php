@@ -4,8 +4,8 @@
 
 class TipoAA extends AppModel {
 
-  public $name = 'TipoAA';
-  public $useTable = 'taux_tipos_aa';
-  public $displayField = 'description';
+	public $name = 'TipoAA';
+	public $useTable = 'taux_tipos_aa';
+	public $displayField = 'description';
 
 }

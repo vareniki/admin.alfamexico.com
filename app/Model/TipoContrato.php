@@ -4,8 +4,8 @@
 
 class TipoContrato extends AppModel {
 
-  public $name = 'TipoContrato';
-  public $useTable = 'taux_tipos_contrato';
-  public $displayField = 'description';
+	public $name = 'TipoContrato';
+	public $useTable = 'taux_tipos_contrato';
+	public $displayField = 'description';
 
 }

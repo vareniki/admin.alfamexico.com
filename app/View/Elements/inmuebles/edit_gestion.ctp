@@ -36,6 +36,14 @@ echo $this->App->horizontalSelect('Inmueble.medio_captacion_id', 'Medio de capta
     <?php echo $this->Form->select('Inmueble.honor_agencia_unid', array('%' => '%', 'e' => $moneda), array('class' => 'form-control', 'label' => false)); ?>
   </div>
 </div>
+<?php /* if ($info['Inmueble']['tipo_contrato_id'] != 'PV') { ?>
+<div class="form-group">
+	<label class="control-label col-xs-5 col-lg-4 col-sm-4 obligat"></label>
+	<div class="controls col-xs-7 col-lg-8 col-sm-8">
+		<input type="checkbox" name="autorizo-3" value="1" id="autorizo-3"> Tengo autorización de la Central de México, para que la comisión esté por debajo de un 3&percnt;
+	</div>
+</div>
+<?php } */?>
 <?php if ($info['Inmueble']['es_venta'] == 't' && $info['Inmueble']['es_alquiler']  == 't'): ?>
 	<div class="form-group">
 		<label class="control-label col-xs-5 col-lg-4 col-sm-4 obligat">Honorarios renta:</label>

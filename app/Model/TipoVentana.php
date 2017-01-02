@@ -4,8 +4,8 @@
 
 class TipoVentana extends AppModel {
 
-  public $name = 'TipoVentana';
-  public $useTable = 'taux_tipos_ventana';
-  public $displayField = 'description';
+	public $name = 'TipoVentana';
+	public $useTable = 'taux_tipos_ventana';
+	public $displayField = 'description';
 
 }

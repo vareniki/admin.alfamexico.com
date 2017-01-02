@@ -4,8 +4,8 @@
 
 class TipoPuerta extends AppModel {
 
-  public $name = 'TipoPuerta';
-  public $useTable = 'taux_tipos_puerta';
-  public $displayField = 'description';
+	public $name = 'TipoPuerta';
+	public $useTable = 'taux_tipos_puerta';
+	public $displayField = 'description';
 
 }

@@ -4,8 +4,8 @@
 
 class EstadoInmueble extends AppModel {
 
-  public $name = 'EstadoInmueble';
-  public $useTable = 'taux_estados_inmueble';
-  public $displayField = 'description';
+	public $name = 'EstadoInmueble';
+	public $useTable = 'taux_estados_inmueble';
+	public $displayField = 'description';
 
 }

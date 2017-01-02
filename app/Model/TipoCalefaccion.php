@@ -4,8 +4,8 @@
 
 class TipoCalefaccion extends AppModel {
 
-  public $name = 'TipoCalefaccion';
-  public $useTable = 'taux_tipos_calefaccion';
-  public $displayField = 'description';
+	public $name = 'TipoCalefaccion';
+	public $useTable = 'taux_tipos_calefaccion';
+	public $displayField = 'description';
 
 }

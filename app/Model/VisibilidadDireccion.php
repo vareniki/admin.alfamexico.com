@@ -9,8 +9,8 @@
  */
 class VisibilidadDireccion extends AppModel {
 
-  public $name = 'VisibilidadDireccion';
-  public $useTable = 'taux_visibilidades_direccion';
-  public $displayField = 'description';
+	public $name = 'VisibilidadDireccion';
+	public $useTable = 'taux_visibilidades_direccion';
+	public $displayField = 'description';
 
 }

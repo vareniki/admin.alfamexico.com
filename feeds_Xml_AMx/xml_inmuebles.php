@@ -1,5 +1,5 @@
 <?php
-	//ini_set('display_errors', 1);
+//ini_set('display_errors', 1);
 header( "Content-type: text/xml" );
 
 $host     = "91.142.209.61";
@@ -49,7 +49,7 @@ FROM inmuebles i JOIN taux_tipos_inmueble ti ON i.tipo_inmueble_id = ti.id
   JOIN taux_tipos_moneda tipo_mo ON tipo_mo.id = i.moneda_id
   
 WHERE i.web='t' AND i.tipo_inmueble_id IN ('01', '02', '03', '04') AND (i.precio_particular IS NULL OR i.precio_particular = 0)";
-  
+
 $resultID = mysqli_query( $linkID, $query ) or die( "Data not found." );
 
 $xml_output = "<?xml version=\"1.0\"?>\n";
@@ -65,12 +65,12 @@ for ( $x = 0; $x < mysqli_num_rows( $resultID ); $x ++ ) {
 	$xml_output .= "\t\t<referencia>" . $row['referencia_publica'] . "</referencia>\n";
 	$xml_output .= "\t\t<operacion>" . $row['operacion_inmueble'] . "</operacion>\n";
 	$xml_output .= "\t\t<familia>" . $row['tipo_familia_inmueble'] . "</familia>\n";
-	$xml_output .= "\t\t<tipo>" . utf8_encode($row['tipo_inmueble']) . "</tipo>\n";
+	$xml_output .= "\t\t<tipo>" . utf8_encode( $row['tipo_inmueble'] ) . "</tipo>\n";
 	$xml_output .= "\t\t<destacado>" . $row['featured'] . "</destacado>\n";
 	$xml_output .= "\t\t<url>" . "http://alfamexico.com/referencia?id=" . $row['id'] . "</url>\n";
 
 	$xml_output .= "\t\t<precio>" . $row['pvp'] . "</precio>\n";
-	$xml_output .= "\t\t<currency>" . utf8_encode($row['currency_id']) . "</currency>\n";
+	$xml_output .= "\t\t<currency>" . utf8_encode( $row['currency_id'] ) . "</currency>\n";
 	$xml_output .= "\t\t<superficie>" . $row['superficie'] . "</superficie>\n";
 	$xml_output .= "\t\t<habitaciones>" . $row['habitaciones'] . "</habitaciones>\n";
 
@@ -78,7 +78,7 @@ for ( $x = 0; $x < mysqli_num_rows( $resultID ); $x ++ ) {
 	$xml_output .= "\t\t<superficie_terreno>" . $supTerreno . "</superficie_terreno>\n";
 
 
-	$xml_output .= "\t\t<nivel>" . utf8_encode($row['nivel']) . "</nivel>\n";
+	$xml_output .= "\t\t<nivel>" . utf8_encode( $row['nivel'] ) . "</nivel>\n";
 	$parking = $row['pk'];
 	$xml_output .= "\t\t<estacionamiento>" . $parking . "</estacionamiento>\n";
 
@@ -100,22 +100,22 @@ for ( $x = 0; $x < mysqli_num_rows( $resultID ); $x ++ ) {
 	$xml_output .= "\t\t<oficina>" . $row['_owner_office_id'] . "</oficina>\n";
 	$xml_output .= "\t\t<estado>" . utf8_encode( $row['provincia'] ) . "</estado>\n";
 	$xml_output .= "\t\t<ciudad>" . utf8_encode( $row['poblacion'] ) . "</ciudad>\n";
-	$xml_output .= "\t\t<zona>" . utf8_encode($row['zona']) . "</zona>\n";
+	$xml_output .= "\t\t<zona>" . utf8_encode( $row['zona'] ) . "</zona>\n";
 
 	$st = array( "&", "<", ">", "\"", "¡" );
 	$rp = array( "y", "-", "-", "-", "I" );
 
-	$xml_output .= "\t\t<direccion>" . str_replace( $st, $rp, utf8_encode($row['direccion']) ) . "</direccion>\n";
+	$xml_output .= "\t\t<direccion>" . str_replace( $st, $rp, utf8_encode( $row['direccion'] ) ) . "</direccion>\n";
 	$xml_output .= "\t\t<codigo_postal>" . $row['c_p'] . "</codigo_postal>\n";
 
-	$xml_output .= "\t\t<texto_web>" . str_replace( $st, $rp, utf8_encode($row['texto_web']) ) . "</texto_web>\n";
+	$xml_output .= "\t\t<texto_web>" . str_replace( $st, $rp, utf8_encode( $row['texto_web'] ) ) . "</texto_web>\n";
 
 	$queryFotos = "SELECT id, path, fichero, tipo_imagen_id FROM imagenes WHERE inmueble_id='$inmuID' ORDER BY orden ASC";
 	$resultFotos = mysqli_query( $linkID, $queryFotos ) or die( "No hay fotos." );
 
 	while ( $rowFoto = mysqli_fetch_assoc( $resultFotos ) ) {
 
-		$xml_output .= "\t\t<fotos>http://admin.alfamexico.com/noauth/image/o/" . str_replace('/', '|', $rowFoto['path']) . '|' . $rowFoto['fichero'] . "</fotos>\n";
+		$xml_output .= "\t\t<fotos>http://admin.alfamexico.com/noauth/image/o/" . str_replace( '/', '|', $rowFoto['path'] ) . '|' . $rowFoto['fichero'] . "</fotos>\n";
 	}
 
 	$xml_output .= "\t</inmueble>\n";

@@ -4,8 +4,8 @@
 
 class InteriorExterior extends AppModel {
 
-  public $name = 'InteriorExterior';
-  public $useTable = 'taux_interior_exterior';
-  public $displayField = 'description';
+	public $name = 'InteriorExterior';
+	public $useTable = 'taux_interior_exterior';
+	public $displayField = 'description';
 
 }

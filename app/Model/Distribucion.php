@@ -4,8 +4,8 @@
 
 class Distribucion extends AppModel {
 
-  public $name = 'Distribucion';
-  public $useTable = 'taux_distribuciones';
-  public $displayField = 'description';
+	public $name = 'Distribucion';
+	public $useTable = 'taux_distribuciones';
+	public $displayField = 'description';
 
 }

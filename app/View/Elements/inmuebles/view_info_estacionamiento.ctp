@@ -22,7 +22,7 @@
 </ul>
 <ul>
   <?php
-  $this->Model->printIfExists($info, 'gastos_comunidad', array('label' => 'Gastos de comunidad', 'model' => 'Garaje', 'format' => 'currency', 'places' => 2));
+  $this->Model->printIfExists($info, 'gastos_comunidad', array('label' => 'Gastos de comunidad', 'model' => 'Garaje', 'format' => 'currency', 'currency' => 'local', 'places' => 2));
 
   $this->Model->printBooleans($info, array(
     '["Garaje"]["EstadoConservacion"]["description"]' => ''), array('model' => 'expression', 'label' => 'Conservación'));

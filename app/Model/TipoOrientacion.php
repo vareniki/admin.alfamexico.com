@@ -4,8 +4,8 @@
 
 class TipoOrientacion extends AppModel {
 
-  public $name = 'TipoOrientacion';
-  public $useTable = 'taux_tipos_orientacion';
-  public $displayField = 'description';
+	public $name = 'TipoOrientacion';
+	public $useTable = 'taux_tipos_orientacion';
+	public $displayField = 'description';
 
 }

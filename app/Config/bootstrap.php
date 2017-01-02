@@ -25,7 +25,7 @@
  */
 
 // Setup a 'default' cache configuration for use in the application.
-Cache::config('default', array('engine' => 'File'));
+Cache::config( 'default', array( 'engine' => 'File' ) );
 
 /**
  * The settings below can be used to set additional paths to models, views and controllers.
@@ -72,10 +72,10 @@ Cache::config('default', array('engine' => 'File'));
  *
  */
 
-CakePlugin::load('DebugKit');
-CakePlugin::load('TwitterBootstrap');
-CakePlugin::load('CsvView');
-CakePlugin::load('FilterHabtm');
+CakePlugin::load( 'DebugKit' );
+CakePlugin::load( 'TwitterBootstrap' );
+CakePlugin::load( 'CsvView' );
+CakePlugin::load( 'FilterHabtm' );
 
 /**
  * You can attach event listeners to the request lifecycle as Dispatcher Filter . By Default CakePHP bundles two filters:
@@ -86,29 +86,29 @@ CakePlugin::load('FilterHabtm');
  * Feel free to remove or add filters as you see fit for your application. A few examples:
  *
  * Configure::write('Dispatcher.filters', array(
- *		'MyCacheFilter', //  will use MyCacheFilter class from the Routing/Filter package in your app.
- *		'MyPlugin.MyFilter', // will use MyFilter class from the Routing/Filter package in MyPlugin plugin.
- * 		array('callable' => $aFunction, 'on' => 'before', 'priority' => 9), // A valid PHP callback type to be called on beforeDispatch
- *		array('callable' => $anotherMethod, 'on' => 'after'), // A valid PHP callback type to be called on afterDispatch
+ *    'MyCacheFilter', //  will use MyCacheFilter class from the Routing/Filter package in your app.
+ *    'MyPlugin.MyFilter', // will use MyFilter class from the Routing/Filter package in MyPlugin plugin.
+ *    array('callable' => $aFunction, 'on' => 'before', 'priority' => 9), // A valid PHP callback type to be called on beforeDispatch
+ *    array('callable' => $anotherMethod, 'on' => 'after'), // A valid PHP callback type to be called on afterDispatch
  *
  * ));
  */
-Configure::write('Dispatcher.filters', array(
-	'AssetDispatcher',
-	'CacheDispatcher'
-));
+Configure::write( 'Dispatcher.filters', array(
+		'AssetDispatcher',
+		'CacheDispatcher'
+) );
 
 /**
  * Configures default file logging options
  */
-App::uses('CakeLog', 'Log');
-CakeLog::config('debug', array(
-	'engine' => 'FileLog',
-	'types' => array('notice', 'info', 'debug'),
-	'file' => 'debug',
-));
-CakeLog::config('error', array(
-	'engine' => 'FileLog',
-	'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
-	'file' => 'error',
-));
+App::uses( 'CakeLog', 'Log' );
+CakeLog::config( 'debug', array(
+		'engine' => 'FileLog',
+		'types'  => array( 'notice', 'info', 'debug' ),
+		'file'   => 'debug',
+) );
+CakeLog::config( 'error', array(
+		'engine' => 'FileLog',
+		'types'  => array( 'warning', 'error', 'critical', 'alert', 'emergency' ),
+		'file'   => 'error',
+) );

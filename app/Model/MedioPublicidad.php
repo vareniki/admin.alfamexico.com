@@ -4,8 +4,8 @@
 
 class MedioPublicidad extends AppModel {
 
-  public $name = 'MedioPublicidad';
-  public $useTable = 'taux_medios_publicidad';
-  public $displayField = 'description';
+	public $name = 'MedioPublicidad';
+	public $useTable = 'taux_medios_publicidad';
+	public $displayField = 'description';
 
 }

@@ -4,8 +4,9 @@
 
 class Terreno extends AppModel {
 
-  public $name = 'Terreno';
-  public $useTable = 'terrenos';
-  public $belongsTo = array(
-      'TipoTerreno' => array('foreignKey' => 'tipo_terreno_id'));
+	public $name = 'Terreno';
+	public $useTable = 'terrenos';
+	public $belongsTo = array(
+			'TipoTerreno' => array( 'foreignKey' => 'tipo_terreno_id' )
+	);
 }

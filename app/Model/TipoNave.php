@@ -4,8 +4,8 @@
 
 class TipoNave extends AppModel {
 
-  public $name = 'TipoNave';
-  public $useTable = 'taux_tipos_nave';
-  public $displayField = 'description';
+	public $name = 'TipoNave';
+	public $useTable = 'taux_tipos_nave';
+	public $displayField = 'description';
 
 }

@@ -4,8 +4,8 @@
 
 class TipoAguaCaliente extends AppModel {
 
-  public $name = 'TipoAguaCaliente';
-  public $useTable = 'taux_tipos_agua_caliente';
-  public $displayField = 'description';
+	public $name = 'TipoAguaCaliente';
+	public $useTable = 'taux_tipos_agua_caliente';
+	public $displayField = 'description';
 
 }

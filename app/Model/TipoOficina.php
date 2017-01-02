@@ -4,8 +4,8 @@
 
 class TipoOficina extends AppModel {
 
-  public $name = 'TipoOficina';
-  public $useTable = 'taux_tipos_oficina';
-  public $displayField = 'description';
+	public $name = 'TipoOficina';
+	public $useTable = 'taux_tipos_oficina';
+	public $displayField = 'description';
 
 }

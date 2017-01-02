@@ -44,6 +44,32 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
     }
   }
 
+  <?php /* if ($info['Inmueble']['tipo_contrato_id'] != 'PV') { ?>
+  function porcentajesAutorizo(checked) {
+
+	  if ($("#InmuebleHonorAgenciaUnid").val() == '%') {
+
+		  if (checked) {
+              $("#InmuebleHonorAgencia").prop("min", "1");
+		  } else {
+			  $("#InmuebleHonorAgencia").prop("min", "3");
+		  }
+
+	  } else {
+
+		  if (checked) {
+		      $("#InmuebleHonorAgencia").prop("min", "1");
+		  } else {
+			  <?php if ($info['TipoMoneda']['id'] == '08' && $info['Inmueble']['es_venta'] == 't') { ?>
+			  $("#InmuebleHonorAgencia").prop("min", "20000");
+			  <?php } else { ?>
+			  $("#InmuebleHonorAgencia").prop("min", "100");
+			  <?php } ?>
+		  }
+	  }
+  }
+  <?php } */ ?>
+
   function calcularHonorarios() {
     var precioInmueble = parseInt($("#InmueblePrecioVenta").val());
     if (isNaN(precioInmueble) || precioInmueble == 0) {
@@ -68,22 +94,20 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
       honor = 0;
     }
 
+    var precioProp;
+
     var unid = $("#InmuebleHonorAgenciaUnid").val();
-
-    var precioProp = 0;
     if (unid != '%') {
-
-      // Euros
       precioProp = numberWithPoints(precioInmueble - honor);
-      $("#InmuebleHonorAgencia").attr("max", 100000000);
-
+      $("#InmuebleHonorAgencia").attr("max", 100000000); // Euros
     } else {
-
-      // Porcentaje
-      var precioProp = precioInmueble / (1 + honor / 100) ;
+      precioProp = precioInmueble / (1 + honor / 100) ;
       precioProp = numberWithPoints(Math.round(precioProp));
-      $("#InmuebleHonorAgencia").attr("max", 100);
+      $("#InmuebleHonorAgencia").attr("max", 100); // Porcentaje
     }
+    <?php /* if ($info['Inmueble']['tipo_contrato_id'] != 'PV') { ?>
+    porcentajesAutorizo($("#autorizo-3").is(":checked"));
+    <?php } */ ?>
     $("#InmueblePrecioPropietario").val(precioProp);
   }
 
@@ -93,7 +117,6 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
     } else {
       $("#InmuebleInfoBaja").hide();
     }
-
   }
 
   function mostrarParticularVende() {
@@ -130,41 +153,39 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
     });
 
     $("#InmuebleHonorAgenciaUnid").on("change", function() {
+      $("#editForm").validate();
+    });
+
+    $("#InmuebleHonorAgenciaAlqUnid").on("change", function() {
       if (this.value == '%') {
-	      $("#InmuebleHonorAgencia").attr("min", 1);
-        $("#InmuebleHonorAgencia").attr("max", 100);
+        $("#InmuebleHonorAgenciaAlq").attr("max", 100);
       } else {
-
-	      <?php if ($info['TipoMoneda']['id'] == '08' && $info['Inmueble']['es_venta'] == 't') { ?>
-	        $("#InmuebleHonorAgencia").attr("min", 20000);
-	      <?php } ?>
-
-        $("#InmuebleHonorAgencia").attr("max", 100000000);
+        $("#InmuebleHonorAgenciaAlq").attr("max", 1000000);
       }
 
       $("#editForm").validate();
     });
-
-	  $("#InmuebleHonorAgenciaAlqUnid").on("change", function() {
-		  if (this.value == '%') {
-			  $("#InmuebleHonorAgenciaAlq").attr("max", 100);
-		  } else {
-			  $("#InmuebleHonorAgenciaAlq").attr("max", 1000000);
-		  }
-
-		  $("#editForm").validate();
-	  });
 
     mostrarInfoBaja();
     $("#InmuebleEstadoInmuebleId").on("click", function() {
       mostrarInfoBaja();
     });
 
+	mostrarParticularVende();
+	$("#InmuebleTipoContratoId").on("click", function() {
 	  mostrarParticularVende();
-	  $("#InmuebleTipoContratoId").on("click", function() {
-		  mostrarParticularVende();
-	  });
+	});
 
+      if ($("#InmuebleHonorAgenciaUnid").val() == '%' && $("#InmuebleHonorAgencia").val() < 3) {
+          $("#autorizo-3").prop("checked", "checked");
+      }
+    <?php /*if ($info['Inmueble']['tipo_contrato_id'] != 'PV') { ?>
+    porcentajesAutorizo($("#autorizo-3").is(":checked"));
+	$("#autorizo-3").on("click", function() {
+	  var checked = $(this).is(":checked");
+      porcentajesAutorizo(checked);
+    });
+    <?php } */ ?>
     initGalleryButtons();
 
     $('#myTabs a').click(function(e) {

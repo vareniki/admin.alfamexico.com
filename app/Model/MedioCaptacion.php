@@ -4,8 +4,8 @@
 
 class MedioCaptacion extends AppModel {
 
-  public $name = 'MedioCaptacion';
-  public $useTable = 'taux_medios_captacion';
-  public $displayField = 'description';
+	public $name = 'MedioCaptacion';
+	public $useTable = 'taux_medios_captacion';
+	public $displayField = 'description';
 
 }

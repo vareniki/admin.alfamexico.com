@@ -4,7 +4,7 @@
 
 class Zona extends AppModel {
 
-  public $name = 'Zona';
-  public $useTable = 'tgis_zonas';
+	public $name = 'Zona';
+	public $useTable = 'tgis_zonas';
 	public $displayField = 'description';
 }

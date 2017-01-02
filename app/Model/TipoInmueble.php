@@ -4,8 +4,8 @@
 
 class TipoInmueble extends AppModel {
 
-  public $name = 'TipoInmueble';
-  public $useTable = 'taux_tipos_inmueble';
-  public $displayField = 'description';
+	public $name = 'TipoInmueble';
+	public $useTable = 'taux_tipos_inmueble';
+	public $displayField = 'description';
 
 }

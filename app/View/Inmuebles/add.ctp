@@ -143,36 +143,42 @@ echo $this->App->horizontalInput('Inmueble.entrega_promocion', 'Entrega aproxima
         <?php
         echo $this->Form->input('Piso.gastos_comunidad', array('label' => false,
           'type' => 'number', 'div' => false, 'min' => 5, 'max' => 100000, 'class' => 'form-control'));
+        echo $this->App->horizontalSelect('Piso.comunidad_moneda_id', 'Moneda:', $monedas, array('style' => 'width:96px'));
         ?>
       </div>
       <div class="oculto InmuebleTipoInmuebleId02">
         <?php
         echo $this->Form->input('Chalet.gastos_comunidad', array('label' => false,
           'type' => 'number', 'div' => false, 'min' => 5, 'max' => 100000, 'class' => 'form-control'));
+        echo $this->App->horizontalSelect('Chalet.comunidad_moneda_id', 'Moneda:', $monedas, array('style' => 'width:96px'));
         ?>
       </div>
       <div class="oculto InmuebleTipoInmuebleId03">
         <?php
         echo $this->Form->input('Local.gastos_comunidad', array('label' => false,
           'type' => 'number', 'div' => false, 'min' => 5, 'max' => 100000, 'class' => 'form-control'));
+        echo $this->App->horizontalSelect('Local.comunidad_moneda_id', 'Moneda:', $monedas, array('style' => 'width:96px'));
         ?>
       </div>
       <div class="oculto InmuebleTipoInmuebleId04">
         <?php
         echo $this->Form->input('Oficina.gastos_comunidad', array('label' => false,
           'type' => 'number', 'div' => false, 'min' => 5, 'max' => 100000, 'class' => 'form-control'));
+        echo $this->App->horizontalSelect('Oficina.comunidad_moneda_id', 'Moneda:', $monedas, array('style' => 'width:96px'));
         ?>
       </div>
       <div class="oculto InmuebleTipoInmuebleId05">
         <?php
         echo $this->Form->input('Garaje.gastos_comunidad', array('label' => false,
           'type' => 'number', 'div' => false, 'min' => 5, 'max' => 100000, 'class' => 'form-control'));
+        echo $this->App->horizontalSelect('Garaje.comunidad_moneda_id', 'Moneda:', $monedas, array('style' => 'width:96px'));
         ?>
       </div>
       <div class="oculto InmuebleTipoInmuebleId07">
         <?php
         echo $this->Form->input('Nave.gastos_comunidad', array('label' => false,
           'type' => 'number', 'div' => false, 'min' => 5, 'max' => 100000, 'class' => 'form-control'));
+        echo $this->App->horizontalSelect('Nave.comunidad_moneda_id', 'Moneda:', $monedas, array('style' => 'width:96px'));
         ?>
       </div>
     </div>

@@ -20,7 +20,7 @@
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-App::uses('AppController', 'Controller');
+App::uses( 'AppController', 'Controller' );
 
 /**
  * Static content controller
@@ -45,12 +45,13 @@ class PagesController extends AppController {
 	 * @var array
 	 */
 	public $uses = array();
-	public $helpers = array('Html', 'Form');
+	public $helpers = array( 'Html', 'Form' );
 
 	/**
 	 * Displays a view
 	 *
 	 * @param mixed What page to display
+	 *
 	 * @return void
 	 */
 	public function display() {

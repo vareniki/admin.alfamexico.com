@@ -57,7 +57,7 @@
 </ul>
 <ul>
   <?php
-  $this->Model->printIfExists($info, 'gastos_comunidad', array('label' => 'Gastos de comunidad', 'model' => 'Oficina', 'format' => 'currency', 'places' => 2));
+  $this->Model->printIfExists($info, 'gastos_comunidad', array('label' => 'Gastos de comunidad', 'model' => 'Oficina', 'format' => 'currency', 'currency' => 'local', 'places' => 2));
 
   if (!empty($info['Inmueble']['calidad_precio'])) {
 	  echo '<li><span>Calidad / precio</span>' . $calidadPrecio[$info['Inmueble']['calidad_precio']] . '.</li>';

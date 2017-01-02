@@ -4,7 +4,7 @@
 
 class Provincia extends AppModel {
 
-  public $name = 'Provincia';
-  public $useTable = 'tgis_provincias';
+	public $name = 'Provincia';
+	public $useTable = 'tgis_provincias';
 	public $displayField = 'description';
 }

@@ -9,9 +9,11 @@
  */
 class Garaje extends AppModel {
 
-  public $name = 'Garaje';
-  public $useTable = 'garajes';
-  public $belongsTo = array(
-      'TipoGaraje' => array('foreignKey' => 'tipo_garaje_id'),
-      'EstadoConservacion' => array('foreignKey' => 'estado_conservacion_id'));
+	public $name = 'Garaje';
+	public $useTable = 'garajes';
+	public $belongsTo = array(
+			'TipoGaraje'         => array( 'foreignKey' => 'tipo_garaje_id' ),
+			'EstadoConservacion' => array( 'foreignKey' => 'estado_conservacion_id' ),
+      'TipoMoneda'    => array( 'foreignKey' => 'comunidad_moneda_id' )
+	);
 }

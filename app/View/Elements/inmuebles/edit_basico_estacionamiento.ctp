@@ -38,5 +38,6 @@ echo $this->App->horizontalInput('Inmueble.entrega_promocion', 'Entrega aproxima
 <!-- Gastos de comunidad -->
 <?php
 echo $this->App->horizontalInput('Garaje.gastos_comunidad', 'Gastos de comunidad:', array('type' => 'number', 'div' => false, 'min' => 5, 'max' => 100000));
+echo $this->App->horizontalSelect('Garaje.comunidad_moneda_id', '<span>[*]</span> Moneda:', $monedas, array('labelClass' => 'obligat', 'style' => 'width:96px'));
 echo "<hr>";
 echo $this->App->horizontalInput('Inmueble.titulo_anuncio', 'T&iacute;tulo del anuncio:', array('maxlength' => 100));
