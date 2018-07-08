@@ -95,7 +95,6 @@ class InmueblesController extends AppController {
 	private static $operaciones = array(
 			'ven' => 'venta',
 			'alq' => 'alquiler',
-			'tra' => 'traspaso',
 			'opc' => 'opción a compra'
 	);
 
@@ -131,12 +130,10 @@ class InmueblesController extends AppController {
 					'Inmueble.codigo',
 					'Inmueble.es_venta',
 					'Inmueble.es_alquiler',
-					'Inmueble.es_traspaso',
 					'Inmueble.coord_x',
 					'Inmueble.coord_y',
 					'Inmueble.precio_venta',
 					'Inmueble.precio_alquiler',
-					'Inmueble.precio_traspaso',
 					'Inmueble.moneda_id',
 					'Inmueble.poblacion',
 					'Inmueble.provincia',
@@ -151,6 +148,7 @@ class InmueblesController extends AppController {
 					'Inmueble.numero_calle',
 					'Inmueble.zona',
 					'Inmueble.titulo_anuncio',
+          'Inmueble.estado_inmueble_id',
 					'Piso.area_total_construida',
 					'Piso.numero_habitaciones',
 					'Piso.numero_banos',
@@ -506,13 +504,19 @@ class InmueblesController extends AppController {
 		} );
 	}
 
-	private function getPortales() {
-		$CI = $this;
+  private function getPortales() {
+    $CI = $this;
+    return $this->Alfa->getTypologyInfo('Portal', function() use ($CI) {
+      return $CI->Portal->find('all', array('order' => 'id', 'callbacks' => false, 'conditions' => array('incluir' => 't')));
+    });
+  }
 
-		return $this->Alfa->getTypologyInfo( 'Portal', function () use ( $CI ) {
-			return $CI->Portal->find( 'all', array( 'order' => 'id', 'callbacks' => false ) );
-		} );
-	}
+  private function getNoPortales() {
+    $CI = $this;
+    return $this->Alfa->getTypologyInfo('Portal', function() use ($CI) {
+      return $CI->Portal->find('all', array('order' => 'id', 'callbacks' => false, 'conditions' => array('excluir' => 't')));
+    }, false);
+  }
 
 	private function getPortalesNo00( $isCentral ) {
 		$CI = $this;
@@ -598,7 +602,7 @@ class InmueblesController extends AppController {
 	 *
 	 * @return null
 	 */
-	private function salvarInmueble( $info, $lastInfo = null ) {
+	private function salvarInmueble( $info, $lastInfo = null, $msg_duplicados = null) {
 
 		if ( isset( $info['Inmueble']['id'] ) ) {
 			$id = $info['Inmueble']['id'];
@@ -606,7 +610,7 @@ class InmueblesController extends AppController {
 			$agencia = $this->viewVars['agencia']['Agencia'];
 			$agente  = isset( $this->viewVars['agente']['Agente'] ) ? $this->viewVars['agente']['Agente'] : array();
 
-			$cambios = $this->InmueblesInfo->getActualizacionCambios( $info, $lastInfo, $agencia, $agente, ( $this->request->data['_checkdup'] == '1' ) );
+			$cambios = $this->InmueblesInfo->getActualizacionCambios( $info, $lastInfo, $agencia, $agente, ( $this->request->data['_checkdup'] == '1' ), $msg_duplicados );
 			if ( ! empty( $cambios ) ) {
 				$ret = $this->Evento->saveMany( $cambios );
 			}
@@ -843,19 +847,19 @@ class InmueblesController extends AppController {
 		$this->set( 'operaciones', array( '' => '-- operación --' ) + self::$operaciones );
 		$this->set( 'maximoAnios', array(
 				''   => '-- años --',
-				'on' => 'obra nueva',
+				'on' => 'desarrollo',
 				'10' => 'hasta 10 años',
 				'20' => 'hasta 20 años',
 				'30' => 'hasta 30 años'
 		) );
 		$this->set( 'minimoDormitorios', array(
-				''  => '-- min. dormit. --',
+				''  => '- dor -',
 				'1' => '1+',
 				'2' => '2+',
 				'3' => '3+',
 				'4' => '4+'
 		) );
-		$this->set( 'minimoBannos', array( '' => '-- min. baños --', '1' => '1+', '2' => '2+', '3' => '3+', '4' => '4+' ) );
+		$this->set( 'minimoBannos', array( '' => '- bañ -', '1' => '1+', '2' => '2+', '3' => '3+', '4' => '4+' ) );
 		$this->set( 'estadosConservacion', array( '' => '-- conservación --' ) + self::getEstadosConservacion() );
 
 		$this->set( 'tiposEquipamiento', array( '' => '-- equipamiento --' ) + $this->getTiposEquipamiento() );
@@ -881,8 +885,6 @@ class InmueblesController extends AppController {
 					case 'precio':
 						if ( isset( $search['Inmueble.es_alquiler'] ) ) {
 							$this->paginate['order'] = array( 'Inmueble.precio_alquiler' => 'asc' );
-						} else if ( isset( $search['Inmueble.es_traspaso'] ) ) {
-							$this->paginate['order'] = array( 'Inmueble.precio_traspaso' => 'asc' );
 						} else {
 							$this->paginate['order'] = array( 'Inmueble.precio_venta' => 'asc' );
 						}
@@ -916,11 +918,12 @@ class InmueblesController extends AppController {
 
 	}
 
-	/**
-	 *
-	 * @param type $id
-	 * @param type $url_64
-	 */
+  /**
+   * @param null $id
+   * @param null $url_64
+   *
+   * @return mixed
+   */
 	public function view( $id = null, $url_64 = null ) {
 		/*
 		 * Comprueba si se le pasa un parámetro ($id). En caso de que se le pase dicho parámetro reinicia y obtiene la última página.
@@ -931,7 +934,12 @@ class InmueblesController extends AppController {
 		}
 
 		// Llama a la función específica en función del tipo de inmueble actual
-		$info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
+    $info = Cache::read('InmuebleId-' . $id);
+    if (!$info) {
+      $info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
+      Cache::write('InmuebleId-' . $id, $info);
+    }
+
 		$this->set( 'info', $info );
 
 		$tipoInmueble = self::$tiposInmueble[ $info['Inmueble']['tipo_inmueble_id'] ];
@@ -954,7 +962,7 @@ class InmueblesController extends AppController {
 		if ( $id == null && $this->request->is( 'post' ) ) {
 			$info = $this->request->data;
 
-			if ( ! empty( $info ) ) {
+			if (!empty($info)) {
 
 				if ( ! isset( $info['Inmueble']['id'] ) ) {
 
@@ -962,8 +970,11 @@ class InmueblesController extends AppController {
 					 * NUEVO INMUEBLE
 					 */
 					$nuevoInmueble = true;
-					$lastInfo      = $this->Session->read( 'Inmueble.info' );
-					$id            = $this->salvarInmueble( $info, $lastInfo );
+					$lastInfo = $this->Session->read( 'Inmueble.info' );
+					if (!isset($lastInfo)) {
+            $lastInfo = null;
+          }
+					$id  = $this->salvarInmueble( $info, $lastInfo );
 
 				} else {
 
@@ -971,6 +982,11 @@ class InmueblesController extends AppController {
 					 * EDICIÓN DE INMUEBLE
 					 */
 					$id = $info['Inmueble']['id'];
+
+					// Elimina la caché
+          Cache::delete('InmuebleId-' . $id);
+
+          $msg_duplicado = null;
 
 					if ( $info['Inmueble']['estado_inmueble_id'] == '02' ) {
 						$aceptar_estado = true;
@@ -992,7 +1008,8 @@ class InmueblesController extends AppController {
 								) );
 
 								if ( ! empty( $found ) ) {
-									$this->setDangerFlash( 'Duplicado con referencia ' . $found['Inmueble']['numero_agencia'] . '/' . $found['Inmueble']['codigo'] );
+								  $msg_duplicado = 'Duplicado con referencia ' . $found['Inmueble']['numero_agencia'] . '/' . $found['Inmueble']['codigo'];
+									$this->setDangerFlash( $msg_duplicado );
 									$aceptar_estado = false;
 								}
 
@@ -1017,7 +1034,8 @@ class InmueblesController extends AppController {
 								) );
 
 								if ( ! empty( $found ) ) {
-									$this->setDangerFlash( 'Posible duplicado con referencia ' . $found['Inmueble']['numero_agencia'] . '/' . $found['Inmueble']['codigo'] );
+								  $msg_duplicado = 'Posible duplicado con referencia ' . $found['Inmueble']['numero_agencia'] . '/' . $found['Inmueble']['codigo'];
+									$this->setDangerFlash( $msg_duplicado );
 								}
 							}
 						}
@@ -1025,7 +1043,7 @@ class InmueblesController extends AppController {
 
 					$lastInfo = $this->Session->read( 'Inmueble.info' );
 
-					$this->salvarInmueble( $info, $lastInfo );
+					$this->salvarInmueble( $info, $lastInfo, $msg_duplicado );
 					$this->enviarFotos( $info );
 					$this->enviarDocumentos( $info );
 				}
@@ -1048,7 +1066,12 @@ class InmueblesController extends AppController {
 		}
 		$this->set( 'selectedTab', $selectedTab );
 
-		$info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
+    $info = Cache::read('InmuebleId-' . $id);
+    if (!$info) {
+      $info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
+      Cache::write('InmuebleId-' . $id, $info);
+    }
+
 		$this->Session->write( 'Inmueble.info', $info );
 
 		$agencia = $this->viewVars['agencia']['Agencia'];
@@ -1064,7 +1087,8 @@ class InmueblesController extends AppController {
 				'TipoSuelo',
 				'TipoPuerta',
 				'TipoVentana',
-				'Portal'
+				'Portal',
+        'NoPortal'
 		) );
 
 		if ( isset( $info['referer'] ) ) {
@@ -1086,6 +1110,7 @@ class InmueblesController extends AppController {
 
 		$this->set( 'calidadPrecio', self::$calidadPrecio );
 		$this->set( 'portales', $this->getPortales() );
+    $this->set( 'noPortales', $this->getNoPortales() );
 
 		if ( $info['Agencia']['id'] == $agencia['id'] ) {
 			$this->set( 'agentes', $this->getAllAgentesAgencia() );
@@ -1442,7 +1467,30 @@ class InmueblesController extends AppController {
 		$this->layout     = null;
 		$this->response->type( 'application/rtf' );
 
-		$info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
+    $agencia = $this->viewVars['agencia'];
+    $agente  = isset( $this->viewVars['agente']['Agente'] ) ? $this->viewVars['agente']['Agente'] : [];
+
+		$evento = [
+		    'fecha' => date('Y-m-d H:i:s'),
+        'tipo_evento_id' => '07',
+        'inmueble_id' => $id,
+        'texto' => 'Impresión de hoja de visita',
+        'agencia_id' => $agencia['Agencia']['id'],
+        'user_id' => $agencia['User']['id'],
+    ];
+
+		if (isset($agente['id'])) {
+      $evento['agente_id'] = $agente['id'];
+    }
+
+    $this->Evento->save($evento);
+
+    // Llama a la función específica en función del tipo de inmueble actual
+    $info = Cache::read('InmuebleId-' . $id);
+    if (!$info) {
+      $info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
+      Cache::write('InmuebleId-' . $id, $info);
+    }
 
 		$view = new View( $this, false );
 		$view->set( 'info', $info );
@@ -1450,8 +1498,20 @@ class InmueblesController extends AppController {
 		return $view->render( 'hoja_visita' );
 	}
 
+	public function address() {
+	  $lat = 40.4204538;
+	  $lng = -3.7096893;
+    //$url    = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' . trim( $lat ) . ',' . trim( $lng ) . '&sensor=false&key=AIzaSyAr6xxQvPWvBslfoELkCuWznJ9Kw4j9-9c';
+    $url    = 'https://maps.googleapis.com/maps/api/geocode/json?address=alcobendas,spain&sensor=false&key=AIzaSyAr6xxQvPWvBslfoELkCuWznJ9Kw4j9-9c';
+    $json   = @file_get_contents( $url );
+    $data   = json_decode( $json );
+    $status = $data->status;
+
+    $this->set('info', $json);
+  }
+
 	private static function getaddress( $lat, $lng ) {
-		$url    = 'http://maps.googleapis.com/maps/api/geocode/json?latlng=' . trim( $lat ) . ',' . trim( $lng ) . '&sensor=false';
+		$url    = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' . trim( $lat ) . ',' . trim( $lng ) . '&sensor=false';
 		$json   = @file_get_contents( $url );
 		$data   = json_decode( $json );
 		$status = $data->status;

@@ -16,7 +16,6 @@ $this->set('title_for_layout', $title);
 $mapBtn_disabled = empty($this->request->data['Demanda']['data_polygons']);
 
 $this->start('header');
-echo $this->Html->script(array('http://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,places', 'alfainmo.maps'));
 ?>
 <script type="text/javascript">
 
@@ -56,6 +55,10 @@ echo $this->Html->script(array('http://maps.googleapis.com/maps/api/js?sensor=fa
 			$("#dataPolygons").val("");
 
 			$(this).addClass("disabled");
+
+            if (drawingManager.getPrimitives()) {
+                drawingManager.clear();
+            }
 		});
 
 		$("#DemandaBusqueda").on("change", function () {
@@ -178,12 +181,16 @@ echo $this->Form->hidden('Demanda.data_polygons', array('id' => 'dataPolygons'))
 	<div class="col-xs-4 col-sm-2">
 		<?php echo $this->Form->select('Demanda.operacion', $operaciones, array('class' => 'form-control obligat', 'type' => 'number')); ?>
 	</div>
-	<div class="col-xs-4 col-sm-2">
+	<div class="col-xs-2 col-sm-1">
 		<?php echo $this->Form->select('Demanda.habitaciones', $minimoDormitorios, array('class' => 'form-control', 'label' => false)); ?>
 	</div>
-	<div class="col-xs-4 col-sm-2">
+	<div class="col-xs-2 col-sm-1">
 		<?php echo $this->Form->select('Demanda.banos', $minimoBannos, array('class' => 'form-control', 'label' => false)); ?>
 	</div>
+    <div class="col-xs-4 col-sm-2">
+      <?php echo $this->Form->input('Demanda.precio_min', array('class' => 'form-control obligat', 'label' => false,
+            'min' => 0, 'maxlength' => 12, 'placeholder' => 'precio m&iacute;nimo', 'escape' => false)); ?>
+    </div>
 	<div class="col-xs-4 col-sm-2">
 		<?php echo $this->Form->input('Demanda.precio', array('class' => 'form-control obligat', 'label' => false,
 			'min' => 0, 'maxlength' => 12, 'placeholder' => 'precio m&aacute;ximo', 'escape' => false)); ?>

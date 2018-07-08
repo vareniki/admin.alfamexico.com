@@ -15,5 +15,5 @@ echo $this->App->horizontalInput('Local.m_lineales_escaparate', 'M. Lineales esc
 
 echo $this->App->horizontalInput('Local.numero_aseos', 'Medios ba&ntilde;os:', array('min' => 0, 'max' => 20, 'maxlength' => 2, 'labelClass' => 'obligat'));
 echo $this->App->horizontalInput('Local.plazas_parking', 'Plazas de parking:', array('min' => 0, 'max' => 9999, 'maxlength' => 4));
-echo $this->App->horizontalInput('Local.anio_construccion', 'A&ntilde;o de construcci&oacute;n:', array('maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat'));
+echo $this->App->horizontalInput('Local.anio_construccion', 'A&ntilde;o de construcci&oacute;n (ej. 2015):', ['min' => 1000, 'max' => '2999', 'maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat']);
 echo $this->App->horizontalSelect('Local.estado_conservacion_id', 'Estado de conservaci&oacute;n:', $estadosConservacion, array('size' => '3', 'labelClass' => 'obligat'));

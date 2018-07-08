@@ -103,6 +103,7 @@ echo $this->App->horizontalInput('Agencia.coord_y', 'Longitud:');
 echo '<hr>';
 echo $this->App->horizontalInput('Agencia.nombre_contacto', '<span>[*]</span> Nombre del contacto:', array('maxlength' => 50, 'required' => true));
 echo $this->App->horizontalInput('Agencia.email_contacto', '<span>[*]</span> EMail:', array('type' => 'email', 'maxlength' => 50, 'required' => true));
+echo $this->App->horizontalInput('Agencia.email_dueno', 'EMail due&ntilde;o:', array('type' => 'email', 'maxlength' => 50));
 
 echo $this->App->horizontalTextarea('Agencia.observaciones', 'Observaciones:', array('rows' => 6));
 ?>
@@ -111,14 +112,15 @@ echo $this->App->horizontalTextarea('Agencia.observaciones', 'Observaciones:', a
 	<div class="col-md-7 col-lg-8 col-sm-8">
 		<?php
       if ($edit) {
-        echo $this->Form->checkbox('Agencia.active', array('value' => 't', 'label' => 'activo'));
+        echo $this->Form->checkbox('Agencia.active', array('value' => 't', 'label' => 'activa'));
+        echo $this->Form->checkbox('Agencia.suspended', array('value' => 't', 'label' => 'suspendida'));
       } else {
-        echo $this->Form->checkbox('Agencia.active', array('value' => 't', 'label' => 'activo', 'checked' => true));
+        echo $this->Form->checkbox('Agencia.active', array('value' => 't', 'label' => 'activa', 'checked' => true));
+        echo $this->Form->checkbox('Agencia.suspended', array('value' => 't', 'label' => 'suspendida', 'checked' => false));
       }
     ?>
 	</div>
 </div>
-
 <div class="form-group">
   <label class="control-label col-md-5 col-lg-4 col-sm-4">S&oacute;lo central:</label>
   <div class="col-md-7 col-lg-8 col-sm-8">
@@ -136,5 +138,5 @@ echo $this->App->horizontalTextarea('Agencia.observaciones', 'Observaciones:', a
   <div class="col-xs-5 col-lg-4 col-sm-4"></div>
   <div class="col-xs-7 col-lg-8 col-sm-8"><p class="text-info"><em>use tecla "control" para seleccionar o desmarcar varios portales.</em></p></div>
 </div>
-<?php echo $this->App->horizontalSelect('Agencia.Portal', 'Excluir:', $portales, array('multiple' => 'multiple'));
+<?php echo $this->App->horizontalSelect('Agencia.Portal', 'Excluir:', $portales, array('multiple' => 'multiple', 'size' => '6'));
 echo $this->Form->end();

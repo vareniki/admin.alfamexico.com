@@ -8,9 +8,6 @@
   if ($info['Inmueble']['es_alquiler'] == 't') {
     $this->Model->printIfExists($info, 'precio_alquiler', array('label' => 'P. Alquiler: ', 'format' => 'currency', 'tag' => 'p'));
   }
-  if ($info['Inmueble']['es_traspaso'] == 't') {
-    $this->Model->printIfExists($info, 'precio_traspaso', array('label' => 'P. Traspaso: ', 'format' => 'currency', 'tag' => 'p'));
-  }
   ?>
 
 </div>

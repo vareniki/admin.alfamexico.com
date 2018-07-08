@@ -18,7 +18,7 @@ echo $this->App->horizontalInput('Piso.numero_banos', 'Ba&ntilde;os:', array('mi
 echo $this->App->horizontalInput('Piso.numero_aseos', 'Medios ba&ntilde;os:', array('min' => 0, 'max' => 20, 'maxlength' => 2));
 echo '<br>';
 echo $this->App->horizontalInput('Piso.plantas_edificio', 'Plantas edificio:', array('min' => 0, 'max' => 57, 'maxlength' => 2));
-echo $this->App->horizontalInput('Piso.anio_construccion', 'A&ntilde;o de construcci&oacute;n:', array('maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat'));
+echo $this->App->horizontalInput('Piso.anio_construccion', 'A&ntilde;o de construcci&oacute;n (ej. 2015):', ['min' => 1000, 'max' => '2999', 'maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat']);
 echo $this->App->horizontalSelect('Piso.estado_conservacion_id', 'Estado de conservaci&oacute;n:', $estadosConservacion, array('size' => 3, 'labelClass' => 'obligat'));
 echo $this->App->horizontalSelect('Piso.interior_exterior_id', 'Interior / exterior:', $interiorExterior, array('size' => 3, 'empty' => true));
 echo $this->App->horizontalSelect('Piso.tipo_orientacion_id', 'Orientaci&oacute;n:', $tiposOrientacion, array('size' => 8));

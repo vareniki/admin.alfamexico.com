@@ -1,7 +1,7 @@
 <?php
 echo $this->Form->hidden('Chalet.id');
 echo $this->Form->hidden('Chalet.inmueble_id');
-echo $this->App->horizontalRadio('Chalet.tipo_chalet_id', '<span>[*]</span> Tipo de chalet:', $tiposChalet, array('required' => 'true'));
+echo $this->App->horizontalRadio('Chalet.tipo_chalet_id', '<span>[*]</span> Tipo de casa:', $tiposChalet, array('required' => 'true'));
 ?>
 <div class="form-group">
   <label class="control-label col-xs-5 col-lg-4 col-sm-4"><span>[*]</span> Operaci&oacute;n:</label>

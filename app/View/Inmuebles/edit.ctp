@@ -11,7 +11,7 @@ echo $this->element('inmuebles/common_view_left');
 $this->end();
 
 $this->start('header');
-echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainmo.maps', 'alfainmo.docs', 'jquery-ui.min', 'bootbox'));
+echo $this->Html->script(['alfainmo.ajax', 'alfainmo.docs.js?date=20180103', 'jquery-ui.min', 'bootbox']);
 ?>
 <script type="text/javascript">
 
@@ -28,8 +28,6 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
       visibles += ",.InmuebleEsVenta";
     if ($("#InmuebleEsAlquiler").is(":checked"))
       visibles += ",.InmuebleEsAlquiler";
-    if ($("#InmuebleEsTraspaso").is(":checked"))
-      visibles += ",.InmuebleEsTraspaso";
     if (visibles != "") {
       visibles = visibles.substr(1);
     }
@@ -74,9 +72,6 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
     var precioInmueble = parseInt($("#InmueblePrecioVenta").val());
     if (isNaN(precioInmueble) || precioInmueble == 0) {
       precioInmueble = parseInt($("#InmueblePrecioAlquiler").val());
-      if (isNaN(precioInmueble) || precioInmueble == 0) {
-        precioInmueble = parseInt($("#InmueblePrecioTraspaso").val());
-      }
     }
     if (isNaN(precioInmueble)) {
       precioInmueble = 0;
@@ -100,9 +95,15 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
     if (unid != '%') {
       precioProp = numberWithPoints(precioInmueble - honor);
       $("#InmuebleHonorAgencia").attr("max", 100000000); // Euros
+
+      <?php if ($info['TipoMoneda']['id'] == '08' && $info['Inmueble']['es_venta'] == 't') { ?>
+        $("#InmuebleHonorAgencia").attr("min", 20000);
+      <?php } ?>
+
     } else {
-      precioProp = precioInmueble / (1 + honor / 100) ;
+      precioProp = precioInmueble - (precioInmueble * honor / 100);
       precioProp = numberWithPoints(Math.round(precioProp));
+      $("#InmuebleHonorAgencia").attr("min", 1); // Porcentaje
       $("#InmuebleHonorAgencia").attr("max", 100); // Porcentaje
     }
     <?php /* if ($info['Inmueble']['tipo_contrato_id'] != 'PV') { ?>
@@ -148,7 +149,7 @@ echo $this->Html->script(array($config['maps.api.js'], 'alfainmo.ajax', 'alfainm
     });
 
     calcularHonorarios();
-    $("#InmuebleHonorAgencia, #InmuebleHonorAgenciaUnid, #InmueblePrecioVenta, #InmueblePrecioAlquiler, #InmueblePrecioTraspaso").on("change", function() {
+    $("#InmuebleHonorAgencia, #InmuebleHonorAgenciaUnid, #InmueblePrecioVenta, #InmueblePrecioAlquiler").on("change", function() {
       calcularHonorarios();
     });
 
@@ -228,7 +229,7 @@ $this->end();
 
 $check_dup = ($info['Inmueble']['estado_inmueble_id'] == '01' && $selectedTab == 'tab2');
 
-echo $this->Form->create(false, array('id' => 'editForm', 'action' => 'edit',
+echo $this->Form->create(false, array('id' => 'editForm', 'url' => 'edit',
   'class' => 'form-horizontal aviso', 'enctype' => 'multipart/form-data'));
 echo $this->Form->hidden('referer');
 echo $this->Form->hidden('checkdup', array('name' => '_checkdup', 'value' => ($check_dup ? '1':'') ));

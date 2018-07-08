@@ -76,8 +76,8 @@ class AppController extends Controller {
 		if ( ! empty( $agencia ) ) {
 			if ( isset( $agencia['Pais']['TipoMoneda'] ) ) {
 				foreach ( $agencia['Pais']['TipoMoneda'] as $moneda ) {
-					$id             = $moneda['id'];
-					$symbol         = $moneda['symbol'];
+					$id = $moneda['id'];
+					$symbol = $moneda['symbol'];
 					$monedas[ $id ] = $symbol;
 				}
 			}
@@ -91,8 +91,8 @@ class AppController extends Controller {
 				$id = $moneda['TipoMoneda']['id'];
 
 				if ( ! isset( $monedas[ $id ] ) ) {
-					$symbol         = $moneda['TipoMoneda']['symbol'];
-					$monedas[ $id ] = $symbol;
+					$symbol = $moneda['TipoMoneda']['symbol'];
+					$monedas[$id] = $symbol;
 				}
 
 			}
@@ -126,21 +126,6 @@ class AppController extends Controller {
 	}
 
 	/**
-	 *
-	 * @return type
-	 */
-	protected function getAgentesAgencia() {
-		$agencia = $this->viewVars['agencia'];
-
-		$result = array();
-		foreach ( $agencia['Agente'] as $agente ) {
-			$result[ $agente['id'] ] = $agente['nombre_contacto'];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * @return array
 	 */
 	protected function getAllAgentesAgencia() {
@@ -148,6 +133,9 @@ class AppController extends Controller {
 
 		$result = array();
 		foreach ( $agentes as $agente ) {
+      if ($agente['User']['active'] != 't') {
+        continue;
+      }
 			$result[ $agente['Agente']['id'] ] = $agente['Agente']['nombre_contacto'];
 		}
 

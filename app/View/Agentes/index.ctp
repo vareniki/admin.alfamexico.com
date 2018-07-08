@@ -81,7 +81,7 @@ echo $this->Form->hidden('sortBy', array('name' => 'sortBy'));
 <div class="text-center">
   <ul class="pagination">
     <?php
-    $this->Paginator->options(array('action' => $this->passedArgs));
+    $this->Paginator->options(array('url' => $this->passedArgs));
     echo $this->Paginator->numbers();
     ?>
   </ul>

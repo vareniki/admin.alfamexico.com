@@ -21,6 +21,7 @@ $rtf->setMarginBottom(1);
 $font = new PHPRtfLite_Font(11, 'Verdada', '#172556');
 $fontBig = new PHPRtfLite_Font(14, 'Verdada', '#172556');
 $font_monospace = new PHPRtfLite_Font(11, 'Courier New', '#172556');
+$fontFooter = new PHPRtfLite_Font(8, 'Verdana');
 $page_center = new PHPRtfLite_ParFormat('center');
 $sect = $rtf->addSection();
 
@@ -53,14 +54,14 @@ if (file_exists($img)) {
 }
 
 // INFORMACIÓN DEL INMUEBLE - Columna derecha
-$right_cell->writeText('REF: ' . $info['Inmueble']['referencia'] . '<br>');
-$right_cell->writeText('TIPO: ' . $info['TipoInmueble']['description'] . '<br>');
+$right_cell->writeText('REF: ' . $info['Inmueble']['referencia'] . '<br>', $font);
+$right_cell->writeText('TIPO: ' . $info['TipoInmueble']['description'] . '<br>', $font);
 
 $lines = [];
 $lines[] = $this->Model->getIfExists($info, 'piso', array('label' => 'PLANTA:', 'model' => $subtipo));
 $lines[] = $this->Model->getIfExists($info, 'area_total_construida', array('label' => 'SUPERF:', 'model' => $subtipo, 'format' => 'area'));
 $lines[] = $this->Model->getIfExists($info, 'area_total', array('label' => 'SUPERF:', 'model' => $subtipo, 'format' => 'area'));
-$lines[] = $this->Model->getIfExists($info, 'numero_habitaciones', array('label' => 'HABITAC:', 'model' => $subtipo, 'format' => 'area'));
+$lines[] = $this->Model->getIfExists($info, 'numero_habitaciones', array('label' => 'HABITAC:', 'model' => $subtipo));
 
 $lines[] = $this->Model->getIfExists($info, 'numero_banos', array('label' => 'Ba&ntilde;os:', 'model' => $subtipo));
 $lines[] = $this->Model->getIfExists($info, 'numero_aseos', array('label' => 'Medios Ba&ntilde;os:', 'model' => $subtipo));
@@ -70,9 +71,6 @@ if ($info['Inmueble']['es_venta'] == 't') {
 }
 if ($info['Inmueble']['es_alquiler'] == 't') {
 	$lines[] = $this->Model->getIfExists($info, 'precio_alquiler', array('label' => 'PRECIO', 'format' => 'currency'));
-}
-if ($info['Inmueble']['es_traspaso'] == 't') {
-	$lines[] = $this->Model->getIfExists($info, 'precio_traspaso', array('label' => 'PRECIO', 'format' => 'currency'));
 }
 
 foreach ($lines as $line) {
@@ -142,9 +140,9 @@ $footer = $sect->addFooter();
 $info_agencia =
 		$agencia['Agencia']['nombre_agencia'] . ' - ' .
 		$agencia['Agencia']['nombre_calle'] . ' n. ' . $agencia['Agencia']['numero_calle'] .
-		$agencia['Agencia']['codigo_postal'] . ' - ' . $agencia['Agencia']['poblacion'] . ' (' . $info['Agencia']['provincia'] . ')<br>' .
+		$agencia['Agencia']['codigo_postal'] . ' - ' . $agencia['Agencia']['poblacion'] . ' (' . $info['Agencia']['provincia'] . '). ' .
 		$agencia['Agencia']['telefono1_contacto'] . ' - ' . $agencia['Agencia']['email_contacto'];
 
-$footer->writeText($info_agencia, $font, new PHPRtfLite_ParFormat('center'));
+$footer->writeText($info_agencia, $fontFooter, new PHPRtfLite_ParFormat('center'));
 
 $rtf->sendRtf($rtf_file);

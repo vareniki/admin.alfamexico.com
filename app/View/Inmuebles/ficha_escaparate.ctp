@@ -23,7 +23,8 @@ $descFont = new PHPRtfLite_Font(14, 'Verdana');
 
 // Titular de la ficha de escaparate
 $font = new PHPRtfLite_Font(16, 'Verdana');
-$fontTitle = new PHPRtfLite_Font(14, 'Verdana');
+$fontTitle = new PHPRtfLite_Font(16, 'Verdana');
+$fontFooter = new PHPRtfLite_Font(8, 'Verdana');
 $sect->writeText($this->Inmuebles->printDescripcion($info), $fontTitle, $centerFormat);
 $sect->writeText('<br><br>');
 
@@ -64,7 +65,7 @@ $lines[] = $this->Model->getIfExists($info, 'numero_habitaciones', array('label'
 $lines[] = $this->Model->getIfExists($info, 'numero_banos', array('label' => 'Ba&ntilde;os:', 'model' => $subtipo));
 $lines[] = $this->Model->getIfExists($info, 'numero_aseos', array('label' => 'Medios Ba&ntilde;os:', 'model' => $subtipo));
 
-$lines[] = $this->Model->getIfExists($info, 'anio_construccion', array('label' => 'A&ntilde;o Construcci&oacute;n:', 'model' => $subtipo, 'format' => 'number'));
+$lines[] = $this->Model->getIfExists($info, 'anio_construccion', array('label' => 'A&ntilde;o Construcci&oacute;n:', 'model' => $subtipo));
 $lines[] = $this->Model->getIfExists($info, 'area_total_construida', array('label' => 'M2 Construidos:', 'model' => $subtipo, 'format' => 'area'));
 $lines[] = $this->Model->getIfExists($info, 'area_total_util', array('label' => 'M2 &Uacute;tiles:', 'model' => $subtipo, 'format' => 'area'));
 $lines[] = $this->Model->getIfExists($info, 'area_salon', array('label' => '&Aacute;rea Sal&oacute;n:', 'model' => $subtipo, 'format' => 'area'));
@@ -89,13 +90,10 @@ if ($info['Inmueble']['es_venta'] == 't') {
 if ($info['Inmueble']['es_alquiler'] == 't') {
 	$lines[] = $this->Model->getIfExists($info, 'precio_alquiler', array('label' => 'Precio Renta:', 'format' => 'currency'));
 }
-if ($info['Inmueble']['es_traspaso'] == 't') {
-	$lines[] = $this->Model->getIfExists($info, 'precio_traspaso', array('label' => 'Precio Traspaso:', 'format' => 'currency'));
-}
 
 foreach ($lines as $line) {
 	if (!empty($line)) {
-		$right_cell->writeText( strip_tags($line) . '<br>', $descFont);
+		$right_cell->writeText( str_replace ('.', '', strip_tags($line))  . '<br>', $descFont);
 	}
 }
 
@@ -106,13 +104,13 @@ $right_cell->writeText($info['Inmueble']['descripcion'], $descFont);
 
 // Información de la agencia
 $info_agencia =
-		$info['Agencia']['nombre_agencia'] . ' - ' .
-		$info['Agencia']['nombre_calle'] . ' n. ' . $info['Agencia']['numero_calle'] .
-    $info['Agencia']['codigo_postal'] . ' - ' . $info['Agencia']['poblacion'] . ' (' . $info['Agencia']['provincia'] . ')<br>' .
-		$info['Agencia']['telefono1_contacto'] . ' - ' . $info['Agencia']['email_contacto'];
+		$agencia['Agencia']['nombre_agencia'] . ' - ' .
+    $agencia['Agencia']['nombre_calle'] . ' n. ' . $agencia['Agencia']['numero_calle'] .
+    ', CP: ' . $agencia['Agencia']['codigo_postal'] . ' - ' . $agencia['Agencia']['poblacion'] . ' (' . $agencia['Agencia']['provincia'] . '). ' .
+    $agencia['Agencia']['telefono1_contacto'] . ' - ' . $agencia['Agencia']['email_contacto'];
 
 $sect->writeText('<br>');
-$sect->writeText($info_agencia, $font, $centerFormat);
+$sect->writeText($info_agencia, $fontFooter, $centerFormat);
 
 $footer = $sect->addFooter();
 $image = $footer->addImage(realpath('img/pie-ficha-escaparate.png'), null, 19);

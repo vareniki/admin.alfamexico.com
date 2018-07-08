@@ -11,7 +11,7 @@ echo $this->element( 'inmuebles/common_view_left' );
 $this->end();
 
 $this->start( 'header' );
-echo $this->Html->script( array( 'alfainmo.docs' ) );
+echo $this->Html->script( ['alfainmo.docs.js?date=20180103'] );
 ?>
 <script type="text/javascript">
     var eventsLoaded = false;
@@ -89,12 +89,6 @@ $ver_todo = $profile['is_central'] || ( $agencia['Agencia']['id'] == $info['Agen
                       if ( $info['Inmueble']['es_alquiler'] == 't' ) {
                         $this->Model->printIfExists( $info, 'precio_alquiler', array(
                             'label'  => 'Precio de renta',
-                            'format' => 'currency'
-                        ) );
-                      }
-                      if ( $info['Inmueble']['es_traspaso'] == 't' ) {
-                        $this->Model->printIfExists( $info, 'precio_traspaso', array(
-                            'label'  => 'Precio de traspaso',
                             'format' => 'currency'
                         ) );
                       }
@@ -462,7 +456,7 @@ $ver_todo = $profile['is_central'] || ( $agencia['Agencia']['id'] == $info['Agen
 <?php if ( $info['Inmueble']['estado_inmueble_id'] == '02' ): ?>
     <div>
         <a
-                href="http://www.alfamexico.com/referencia/?id=<?php echo $info['Inmueble']['id'] ?>&referencia=<?php echo $info['Inmueble']['numero_agencia'] ?>-<?php echo $info['Inmueble']['codigo'] ?>"
+                href="http://<?php echo $agencia['Agencia']['web'] ?>/ref/<?php echo $info['Inmueble']['numero_agencia'] ?>-<?php echo $info['Inmueble']['codigo'] ?>/"
                 target="_blank">Ficha en la Web</a>
     </div>
 <?php endif; ?>

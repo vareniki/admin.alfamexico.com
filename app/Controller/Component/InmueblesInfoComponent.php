@@ -2,7 +2,7 @@
 
 App::uses('SessionComponent', 'Controller');
 
-define('IMAGEN_G', 590);
+define('IMAGEN_G', 800);
 define('IMAGEN_M', 296);
 define('IMAGEN_P', 148);
 
@@ -222,7 +222,7 @@ class InmueblesInfoComponent extends SessionComponent {
 	 * @param $lastInfo
 	 * @return array
 	 */
-	public function getActualizacionCambios($info, $lastInfo, $agencia, $agente, $checkdup) {
+	public function getActualizacionCambios($info, $lastInfo, $agencia, $agente, $checkdup, $msg_duplicados) {
 
 	  $result = array();
 
@@ -247,6 +247,60 @@ class InmueblesInfoComponent extends SessionComponent {
 			);
 	  }
 
+    if ($info['Inmueble']['es_venta'] != $lastInfo['Inmueble']['es_venta']) {
+
+	    if ($info['Inmueble']['es_venta'] == 't') {
+	      $texto = 'El inmueble ha pasado a estar en venta';
+      } else {
+        $texto = 'El inmueble ha dejado a estar en venta';
+      }
+
+      $result[] = array(
+          'fecha' => date('Y-m-d H:i:s'),
+          'tipo_evento_id' => 42,
+          'inmueble_id' => $info['Inmueble']['id'],
+          'texto' => $texto,
+          'agente_id' => $agente_id,
+          'agencia_id' => $agencia_id
+      );
+    }
+
+    if ($info['Inmueble']['es_alquiler'] != $lastInfo['Inmueble']['es_alquiler']) {
+
+      if ($info['Inmueble']['es_alquiler'] == 't') {
+        $texto = 'El inmueble ha pasado a estar en renta';
+      } else {
+        $texto = 'El inmueble ha dejado a estar en renta';
+      }
+
+      $result[] = array(
+          'fecha' => date('Y-m-d H:i:s'),
+          'tipo_evento_id' => 42,
+          'inmueble_id' => $info['Inmueble']['id'],
+          'texto' => $texto,
+          'agente_id' => $agente_id,
+          'agencia_id' => $agencia_id
+      );
+    }
+
+    if (isset($info['Inmueble']['es_traspaso']) && $info['Inmueble']['es_traspaso'] != $lastInfo['Inmueble']['es_traspaso']) {
+
+      if ($info['Inmueble']['es_traspaso'] == 't') {
+        $texto = 'El inmueble ha pasado a estar en traspaso';
+      } else {
+        $texto = 'El inmueble ha dejado a estar en traspaso';
+      }
+
+      $result[] = array(
+          'fecha' => date('Y-m-d H:i:s'),
+          'tipo_evento_id' => 42,
+          'inmueble_id' => $info['Inmueble']['id'],
+          'texto' => $texto,
+          'agente_id' => $agente_id,
+          'agencia_id' => $agencia_id
+      );
+    }
+
 		if (!empty($info['Inmueble']['precio_alquiler']) && !empty($lastInfo['Inmueble']['precio_alquiler'])
 				&& $info['Inmueble']['precio_alquiler'] <> $lastInfo['Inmueble']['precio_alquiler']) {
 
@@ -256,20 +310,6 @@ class InmueblesInfoComponent extends SessionComponent {
 				'inmueble_id' => $info['Inmueble']['id'],
 				'numero' => (int) $info['Inmueble']['precio_alquiler'],
 				'numero2' => (int) $lastInfo['Inmueble']['precio_alquiler'],
-				'agente_id' => $agente_id,
-				'agencia_id' => $agencia_id
-			);
-		}
-
-		if (!empty($info['Inmueble']['precio_traspaso']) && !empty($lastInfo['Inmueble']['precio_traspaso'])
-				&& $info['Inmueble']['precio_traspaso'] <> $lastInfo['Inmueble']['precio_traspaso']) {
-
-			$result[] = array(
-				'fecha' => date('Y-m-d H:i:s'),
-				'tipo_evento_id' => 32,
-				'inmueble_id' => $info['Inmueble']['id'],
-				'numero' => (int) $info['Inmueble']['precio_traspaso'],
-				'numero2' => (int) $lastInfo['Inmueble']['precio_traspaso'],
 				'agente_id' => $agente_id,
 				'agencia_id' => $agencia_id
 			);
@@ -296,7 +336,7 @@ class InmueblesInfoComponent extends SessionComponent {
          || $info['Inmueble']['codigo_postal'] <> $lastInfo['Inmueble']['codigo_postal']
          || $info['Inmueble']['poblacion'] <> $lastInfo['Inmueble']['poblacion']
          || $info['Inmueble']['provincia'] <> $lastInfo['Inmueble']['provincia']
-         || $info['Inmueble']['ciudad'] <> $lastInfo['Inmueble']['ciudad']
+         || (isset($info['Inmueble']['ciudad']) && ($info['Inmueble']['ciudad'] <> $lastInfo['Inmueble']['ciudad']))
     ) {
 
       $calle1 = $info['Inmueble']['nombre_calle'];
@@ -309,7 +349,7 @@ class InmueblesInfoComponent extends SessionComponent {
         $calle2 .= ', ' . $lastInfo['Inmueble']['numero_calle'];
       }
 
-      if ($info['Inmueble']['ciudad'] <> $lastInfo['Inmueble']['ciudad'])
+      if (isset($info['Inmueble']['ciudad']) && ($info['Inmueble']['ciudad'] <> $lastInfo['Inmueble']['ciudad']))
       {
         $calle1 .= ' - ' . $info['Inmueble']['ciudad'];
         $calle2 .= ' - ' . $lastInfo['Inmueble']['ciudad'];
@@ -403,8 +443,8 @@ class InmueblesInfoComponent extends SessionComponent {
 		}
 
 		// Comprobación de duplicados (34)
-		if ($info['Inmueble']['estado_inmueble_id'] == '01' && $checkdup) {
-
+		if ($info['Inmueble']['estado_inmueble_id'] == '01' && $checkdup && $msg_duplicados != null) {
+/*
 			$calle = $info['Inmueble']['nombre_calle'];
 			if (!empty($info['Inmueble']['numero_calle'])) {
 				$calle .= ', ' . $info['Inmueble']['numero_calle'];
@@ -418,7 +458,15 @@ class InmueblesInfoComponent extends SessionComponent {
 				'texto' => $calle,
 				'agente_id' => $agente_id,
 				'agencia_id' => $agencia_id
-			);
+			);*/
+      $result[] = array(
+          'fecha' => date('Y-m-d H:i:s'),
+          'tipo_evento_id' => 34,
+          'inmueble_id' => $info['Inmueble']['id'],
+          'texto' => $msg_duplicados,
+          'agente_id' => $agente_id,
+          'agencia_id' => $agencia_id
+      );
 		}
 
 	  return $result;
@@ -508,23 +556,45 @@ class InmueblesInfoComponent extends SessionComponent {
           case 'alq':
             $conditions['Inmueble.es_alquiler'] = 't';
             break;
-          case 'tra':
-            $conditions['Inmueble.es_traspaso'] = 't';
-            break;
       }
     }
 
-    // Precio
-    if (!empty($request['precio'])) {
-      $precio = (int) $request['precio'];
-      if ($precio > 0) {
-        $subcond_or = array();
-        $subcond_or[] = 'precio_venta > 0 AND precio_venta <' . $precio;
-        $subcond_or[] = 'precio_alquiler > 0 AND precio_alquiler <' . $precio;
-        $subcond_or[] = 'precio_traspaso > 0 AND precio_traspaso <' . $precio;
-        $subcond_or = array('OR' => $subcond_or);
-        $conditions[]['AND'] = $subcond_or;
-      }
+    if (isset($request['precio_min'])) {
+      $precio_min = (int) $request['precio_min'];
+    } else {
+      $precio_min = 0;
+    }
+
+    if (isset($request['precio'])) {
+      $precio_max = (int) $request['precio'];
+    } else {
+      $precio_max = 0;
+    }
+
+    // Precios mínimos y máximos
+    if ($precio_min > 0 && $precio_max > 0) {
+
+      $subcond_or  = array();
+      $subcond_or[] = "Inmueble.precio_venta BETWEEN $precio_min AND $precio_max AND Inmueble.es_venta='t'";
+      $subcond_or[] = "Inmueble.precio_alquiler BETWEEN $precio_min AND $precio_max AND Inmueble.es_alquiler='t'";
+      $subcond_or = array( 'OR' => $subcond_or );
+      $conditions[]['AND'] = $subcond_or;
+
+    } else if ($precio_min > 0) {
+
+      $subcond_or  = array();
+      $subcond_or[] = "Inmueble.precio_venta >= $precio_min AND Inmueble.es_venta='t'";
+      $subcond_or[] = "Inmueble.precio_alquiler >= $precio_min AND Inmueble.es_alquiler='t'";
+      $subcond_or = array( 'OR' => $subcond_or );
+      $conditions[]['AND'] = $subcond_or;
+
+    } else if ($precio_max > 0) {
+
+      $subcond_or = array();
+      $subcond_or[] = "Inmueble.precio_venta <= $precio_max AND Inmueble.es_venta='t'";
+      $subcond_or[] = "Inmueble.precio_alquiler <= $precio_max AND Inmueble.es_alquiler='t'";
+      $subcond_or = array( 'OR' => $subcond_or );
+      $conditions[]['AND'] = $subcond_or;
     }
 
     // Años
@@ -713,10 +783,24 @@ class InmueblesInfoComponent extends SessionComponent {
 		  $conditions['Inmueble.calidad_precio'] = $request['calidad_precio'];
 	  }
 
-	  // Tipo de encargo
-	  if (!empty($request['tipo_contrato'])) {
-		  $conditions['Inmueble.tipo_contrato_id'] = $request['tipo_contrato'];
-	  }
+    // Tipo de encargo
+    if ( ! empty( $request['tipo_contrato'] ) ) {
+
+      $tipo_contrato = $request['tipo_contrato'];
+      if ($tipo_contrato == 'AI') {
+
+        $subcond_or   = array();
+        $subcond_or[] = "(Inmueble.tipo_contrato_id = 'AI')";
+        $subcond_or[] = "(Inmueble.tipo_contrato_id = 'PV')";
+
+        $subcond_or   = array( 'OR' => $subcond_or );
+        $conditions[]['AND'] = $subcond_or;
+
+      } else {
+        $conditions['Inmueble.tipo_contrato_id'] = $tipo_contrato;
+      }
+
+    }
 
 	  // Fecha de captación mínima
 	  if (!empty($request['fecha_captacion'])) {
@@ -735,6 +819,7 @@ class InmueblesInfoComponent extends SessionComponent {
 		  $conditions['Portal.id'] = $request['portal_id'];
 	  }
 
+	  // Bajas
     if (!isset($request['inc_bajas']) || $request['inc_bajas'] != 't') {
       $conditions[] = array('Inmueble.fecha_baja IS NULL');
     }
@@ -851,9 +936,8 @@ class InmueblesInfoComponent extends SessionComponent {
 		$precio = 0;
 		$precio += ( isset( $info['Inmueble']['precio_venta'] ) ) ? (int) $info['Inmueble']['precio_venta'] : 0;
 		$precio += ( isset( $info['Inmueble']['precio_alquiler'] ) ) ? (int) $info['Inmueble']['precio_alquiler'] : 0;
-		$precio += ( isset( $info['Inmueble']['precio_traspaso'] ) ) ? (int) $info['Inmueble']['precio_traspaso'] : 0;
 		if ( $precio == 0 ) {
-			$campos .= ', precio de venta, alquiler o traspaso';
+			$campos .= ', precio de venta o renta';
 			$result = false;
 		}
 
@@ -880,7 +964,8 @@ class InmueblesInfoComponent extends SessionComponent {
 				'zona' => 'colonia',
 				'tipo_contrato_id' => 'tipo de encargo',
 				'honor_agencia' => 'honorarios agencia',
-				'honor_compartidos' => 'honorarios compartidos'
+				'honor_compartidos' => 'honorarios compartidos',
+        'descripcion' => 'descripci&oacute;n completa'
 		);
 
 		if ( $info['Inmueble']['es_venta'] && $info['Inmueble']['es_alquiler'] ) {
@@ -1021,7 +1106,7 @@ class InmueblesInfoComponent extends SessionComponent {
     } elseif ($tipo == '01') {
 
       if (!empty($info['Piso']['bloque'])) {
-        $conditions['Piso.bloque'] = $info['Inmueble']['bloque'];
+        $conditions['Piso.bloque'] = $info['Piso']['bloque'];
       }
       if (!empty($info['Piso']['escalera'])) {
         $conditions['Piso.escalera'] = $info['Piso']['escalera'];
@@ -1092,7 +1177,7 @@ class InmueblesInfoComponent extends SessionComponent {
    */
   public function getGoogleCoordinates($direccion, $pais) {
     $direccion_google = "$direccion,$pais";
-    $result = file_get_contents(sprintf('http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=%s', urlencode($direccion_google)));
+    $result = file_get_contents(sprintf('http://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDtAURbonk7OnmybKLnrN2BvD8vycwU4B0&sensor=false&address=%s', urlencode($direccion_google)));
     $result = json_decode($result, TRUE);
 
 	  $point = null;

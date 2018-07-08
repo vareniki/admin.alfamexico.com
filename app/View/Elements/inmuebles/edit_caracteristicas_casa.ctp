@@ -20,7 +20,7 @@ echo $this->App->horizontalInput('Chalet.numero_armarios', 'Armarios empotrados:
 echo $this->App->horizontalInput('Chalet.numero_banos', 'Ba&ntilde;os:', array('min' => 0, 'max' => 20, 'maxlength' => 2, 'labelClass' => 'obligat'));
 echo $this->App->horizontalInput('Chalet.numero_aseos', 'Medios ba&ntilde;os:', array('min' => 0, 'max' => 20, 'maxlength' => 2));
 echo $this->App->horizontalInput('Chalet.plazas_parking', 'Plazas de estacionamiento:', array('min' => 0, 'max' => 10, 'maxlength' => 2));
-echo $this->App->horizontalInput('Chalet.anio_construccion', 'A&ntilde;o de construcci&oacute;n:', array('maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat'));
+echo $this->App->horizontalInput('Chalet.anio_construccion', 'A&ntilde;o de construcci&oacute;n (ej. 2015):', ['min' => 1000, 'max' => '2999', 'maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat']);
 echo $this->App->horizontalSelect('Chalet.estado_conservacion_id', 'Estado de conservaci&oacute;n:', $estadosConservacion, array('size' => 3, 'labelClass' => 'obligat'));
 echo $this->App->horizontalSelect('Chalet.interior_exterior_id', 'Interior / exterior:', $interiorExterior, array('size' => 3, 'empty' => true));
 echo $this->App->horizontalSelect('Chalet.tipo_orientacion_id', 'Orientaci&oacute;n:', $tiposOrientacion, array('size' => 8));

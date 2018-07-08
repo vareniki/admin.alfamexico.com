@@ -256,10 +256,7 @@ class InmueblesHelper extends Helper {
    * @return string
    */
   public function printCiudad($info) {
-    $result = '';
-    if (!empty($info['Inmueble']['codigo_postal']) && !empty($info['Inmueble']['ciudad'])) {
-      $result = $info['Inmueble']['codigo_postal'] . ' - ' . $info['Inmueble']['zona'] . ' - ' . $info['Inmueble']['ciudad'] . ' (' . $info['Inmueble']['provincia'] . ')';
-    }
+    $result = $info['Inmueble']['codigo_postal'] . ' - ' . $info['Inmueble']['zona'] . ' - ' . ((!empty($info['Inmueble']['ciudad'])) ? ' - ' . $info['Inmueble']['ciudad'] : '') . ' (' . $info['Inmueble']['provincia'] . ')';
 
     return $result;
   }
@@ -309,10 +306,7 @@ class InmueblesHelper extends Helper {
       $result[] = 'venta';
     }
     if ($datos['es_alquiler'] == 't') {
-      $result[] = 'alquiler';
-    }
-    if ($datos['es_traspaso'] == 't') {
-      $result[] = 'traspaso';
+      $result[] = 'renta';
     }
     return implode(', ', $result);
   }
@@ -329,15 +323,11 @@ class InmueblesHelper extends Helper {
 
     $precioV = (($info['Inmueble']['es_venta'] == 't') ? $info['Inmueble']['precio_venta'] : null);
     $precioA = (($info['Inmueble']['es_alquiler'] == 't') ? $info['Inmueble']['precio_alquiler'] : null);
-    $precioT = (($info['Inmueble']['es_traspaso'] == 't') ? $info['Inmueble']['precio_traspaso'] : null);
     if ($precioV > 0) {
       $result[] = $this->Number->format((int) $precioV, array('places' => 0, 'before' => false, 'thousands' => ',', 'decimals' => '.')) . " $moneda";
     }
     if ($precioA > 0) {
       $result[] = $this->Number->format((int) $precioA, array('places' => 0, 'before' => false, 'thousands' => ',', 'decimals' => '.')) . " $moneda";
-    }
-    if ($precioT > 0) {
-      $result[] = 'Traspaso: ' . $this->Number->format((int) $precioT, array('places' => 0, 'before' => false, 'thousands' => ',', 'decimals' => '.')) . " $moneda";
     }
 
     return implode('<br>', $result);
@@ -383,9 +373,6 @@ class InmueblesHelper extends Helper {
     $precio = $info['Inmueble']['precio_venta'];
     if ($precio == 0) {
       $precio = $info['Inmueble']['precio_alquiler'];
-      if ($precio == 0) {
-        $precio = $info['Inmueble']['precio_traspaso'];
-      }
     }
     if ($precio == 0) {
       return '';
@@ -435,9 +422,6 @@ class InmueblesHelper extends Helper {
     $precio = $info['Inmueble']['precio_venta'];
     if ($precio == 0) {
       $precio = $info['Inmueble']['precio_alquiler'];
-      if ($precio == 0) {
-        $precio = $info['Inmueble']['precio_traspaso'];
-      }
     }
 
     $precio_metro = round($precio / $metros, 2);
@@ -624,7 +608,11 @@ class InmueblesHelper extends Helper {
 			if (!$propio) {
 				$coord_x += 0.001;
 				$coord_y -= 0.001;
-			}
+			} else {
+			  if ($item['Inmueble']['estado_inmueble_id'] != '02') {
+			    $propio = 2;
+        }
+      }
 
 			$result .= $coma . "['$poblacion,$provincia',$coord_x,$coord_y,$propio]\r\n";
 			$coma = ',';
@@ -715,7 +703,6 @@ class InmueblesHelper extends Helper {
 			switch ($tipo_evento_id) {
 				case 30: // Cambio precio de compra
 				case 31: // Cambio precio de alquiler
-				case 32: // Cambio precio de traspaso
 					$precio1 = $this->Number->format((int) $evento['Evento']['numero2'], array('places' => 0, 'before' => false, 'thousands' => '.', 'decimals' => ','));
 					$precio2 = $this->Number->format((int) $evento['Evento']['numero'], array('places' => 0, 'before' => false, 'thousands' => '.', 'decimals' => ','));
 					echo "$precio1 <i class='glyphicon glyphicon-chevron-right' style='color:#AAA'></i> $precio2";
@@ -764,6 +751,8 @@ class InmueblesHelper extends Helper {
 					$tipo = $evento['Evento']['texto'];
 					echo "$precio1 $tipo<i class='glyphicon glyphicon-chevron-right' style='color:#AAA'></i> $precio2 $tipo";
 					break;
+        case 42: // Cambio en tipo de operación
+          echo $evento['Evento']['texto'];;
 			}
 		}
 	}

@@ -7,96 +7,168 @@ $url_64 = base64_encode($this->Html->url($this->request->data));
 $selectedTab = (!empty($this->passedArgs['selectedTab'])) ? $this->passedArgs['selectedTab'] : 'tab1';
 
 $this->start('header');
-echo $this->Html->script(array('http://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,places', 'alfainmo.maps'));
+echo $this->Html->css(['//ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/themes/redmond/jquery-ui.min.css'], null, ['inline' => false]);
+echo $this->Html->script(['//ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/jquery-ui.min.js']);
 ?>
+<style type="text/css">
+    .infoboxText { text-align: center; background-color:White; border-style:solid; border-width:1px; border-color:#AAA; border-radius: 1px; min-height:190px; width: 240px; padding: 10px; }
+    .infoboxText img { width: 100%; }
+</style>
 <script type="text/javascript">
 
-  var markers = [ <?php echo $this->Inmuebles->getMarkersMap($info, $agencia); ?> ];
-  var infoWindowContent = [ <?php echo $this->Inmuebles->getInfoMarkersMap($info, $url_64); ?> ];
+    var markers = [ <?php echo $this->Inmuebles->getMarkersMap($info, $agencia); ?> ];
+    var infoWindowContent = [ <?php echo $this->Inmuebles->getInfoMarkersMap($info, $url_64); ?> ];
+    var infoBoxes = [];
+    var map;
+
+    function mapCallBack() {
+
+        var mapCenter = new Microsoft.Maps.Location(40.4168444, -3.7038783);
+
+        map = new Microsoft.Maps.Map('#map_canvas', {
+            center: mapCenter,
+            disableScrollWheelZoom: true,
+            mapTypeId: Microsoft.Maps.MapTypeId.road, zoom: 15 }
+        );
+
+        var iconURLPrefix = 'http://maps.google.com/mapfiles/ms/icons/';
+        var icons = [
+            iconURLPrefix + 'blue-dot.png',
+            iconURLPrefix + 'red-dot.png'
+        ]
+
+        var pins = [];
+
+        var infoboxTemplate = '<div class="infoboxText"><p><strong>{title}</strong></p><p>{description}</p><p>{foto}</p></div>';
+        var location = null;
+        infoBoxes = [];
+        for (i = 0; i < markers.length; i++) {
+            var icon_image = icons[markers[i][3]];
+
+            location = new Microsoft.Maps.Location(markers[i][1], markers[i][2]);
+            var content = infoboxTemplate.replace('{title}', infoWindowContent[i][0])
+                .replace('{description}', "<a href='#' class='cls-close' onclick='closeInfobox(this)'>cerrar</a>")
+                .replace('{foto}', "");
+
+            var pushpin = new Microsoft.Maps.Pushpin(location, { icon: icon_image });
+            var infobox = new Microsoft.Maps.Infobox(location, { htmlContent: content, visible: false });
+            infobox.setMap(map);
+
+            infoBoxes.push(infobox);
+
+            pushpin.infoBox = infobox;
+            Microsoft.Maps.Events.addHandler(pushpin, 'click', function (obj) {
+                for (j=0; j< infoBoxes.length; j++) {
+                    var infoBox = infoBoxes[j];
+                    if (infoBox != obj.target.infoBox) {
+                        infoBox.setOptions({ visible: false });
+                    } else {
+                        infoBox.setOptions({ visible: true });
+                    }
+                }
+
+            });
+
+            pins.push(pushpin);
+        }
+        if (location != null) {
+            map.setView({center: location});
+        }
+
+        map.entities.push(pins);
+    }
+
+    function closeInfobox(element) {
+        for (j=0; j< infoBoxes.length; j++) {
+            var infoBox = infoBoxes[j];
+            infoBox.setOptions({ visible: false });
+        }
+        //$(".infoboxText").prepend(element).css("top", "1000px");
+    }
 
   $(document).ready(function() {
 
-    $("#listado").find("thead").on("click", "a", function(e) {
-      var href = this.href.split("#");
-      if (href.length < 2) {
-        return;
-      }
-      var field=href[1];
+      $("#listado").find("thead").on("click", "a", function(e) {
+          var href = this.href.split("#");
+          if (href.length < 2) {
+              return;
+          }
+          var field=href[1];
 
-      $("#sortBy").val(field);
-      $("#searchForm").submit();
+          $("#sortBy").val(field);
+          $("#searchForm").submit();
 
-	    e.preventDefault();
+          e.preventDefault();
+      });
 
-    });
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+          var tab = $(this).attr("data-tab");
+          $("#selectedTab").val(tab);
+      });
 
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      var tab = $(this).attr("data-tab");
-      $("#selectedTab").val(tab);
-    });
+      $("#busqueda-mapBtn").on("click", function() {
+          if ($modalMap != undefined) {
+              $modalMap.modal();
+          }
+      });
 
-	  $("#busqueda-mapBtn").on("click", function() {
-		  if ($modalMap != undefined) {
-			  $modalMap.modal();
-		  }
-	  });
+      $("#busqueda-mapBtn_clear").on("click", function() {
+          if ($(this).hasClass("disabled")) {
+              return;
+          }
+          $("#mapInfo").val("");
+          $("#dataPolygons").val("");
 
-	  $("#busqueda-mapBtn_clear").on("click", function() {
-		  if ($(this).hasClass("disabled")) {
-			  return;
-		  }
-		  $("#mapInfo").val("");
-		  $("#dataPolygons").val("");
+          $(this).addClass("disabled");
 
-		  $(this).addClass("disabled");
-	  });
+          if (drawingManager.getPrimitives()) {
+              drawingManager.clear();
+          }
 
-	  $("#busqueda-clear").on("click", function() {
+      });
 
-		  $("#searchForm").find(':input').each(function() {
-			  switch(this.type) {
-				  case 'select-multiple':
-				  case 'select-one':
-				  case 'text':
-				  case 'textarea':
-					  $(this).val('');
-					  break;
-				  case 'checkbox':
-				  case 'radio':
-					  this.checked = false;
-			  }
-		  });
+      $("#busqueda-clear").on("click", function() {
 
-		  $("#dataPolygons").val("");
-		  $("#busqueda-mapBtn_clear").addClass("disabled");
+          $("#searchForm").find(':input').each(function() {
+              switch(this.type) {
+                  case 'select-multiple':
+                  case 'select-one':
+                  case 'text':
+                  case 'textarea':
+                      $(this).val('');
+                      break;
+                  case 'checkbox':
+                  case 'radio':
+                      this.checked = false;
+              }
+          });
 
-		  map_initShapes();
+          $("#dataPolygons").val("");
+          $("#busqueda-mapBtn_clear").addClass("disabled");
 
-		  return false;
-		});
+          return false;
+      });
 
-	  $("#q").on("change", function() {
-		  $("#dataPolygons").val($("#dataPolygons_hidden").val());
-		  $("#mapInfo").val("");
+      $("#q").on("change", function() {
+          $("#dataPolygons").val($("#dataPolygons_hidden").val());
+          $("#mapInfo").val("");
 
-		  if (selectedShape) {
-			  selectedShape.setMap(null);
-			  maps_createShapes();
-		  }
-	  });
+          if (selectedShape) {
+              selectedShape.setMap(null);
+              maps_createShapes();
+          }
+      });
 
-	  $("#con-direcciones").on("click", function() {
-			$("div.addr-inmueble").removeClass("hidden");
-	  });
+      $("#con-direcciones").on("click", function() {
+          $("div.addr-inmueble").removeClass("hidden");
+      });
 
-	  $("#pais_id").on("change", function() {
-		  $("#mapInfo").val("");
-		  $("#dataPolygons").val("");
-		  $("#busqueda-mapBtn_clear").addClass("disabled");
-		  map_initShapes();
-	  });
+      $("#pais_id").on("change", function() {
+          $("#mapInfo").val("");
+          $("#dataPolygons").val("");
+          $("#busqueda-mapBtn_clear").addClass("disabled");
+      });
 
-	  maps_createMarkers(markers, infoWindowContent);
   });
 </script>
 <?php $this->end();
@@ -198,7 +270,7 @@ echo $this->element('inmuebles/index_form_busqueda');
         if (!empty($this->passedArgs['q'])) {
           $this->passedArgs['q'] = str_replace('/', '|', $this->passedArgs['q']);
         }
-        $this->Paginator->options(array('action' => $this->passedArgs));
+        $this->Paginator->options(array('url' => $this->passedArgs));
         echo $this->Paginator->numbers();
         ?>
       </ul>
@@ -235,7 +307,7 @@ echo $this->element('inmuebles/index_form_busqueda');
         if (!empty($this->passedArgs['q'])) {
           $this->passedArgs['q'] = str_replace('/', '|', $this->passedArgs['q']);
         }
-        $this->Paginator->options(array('action' => $this->passedArgs));
+        $this->Paginator->options(array('url' => $this->passedArgs));
         echo $this->Paginator->numbers();
         ?>
       </ul>

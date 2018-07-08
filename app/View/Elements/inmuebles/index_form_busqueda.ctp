@@ -58,7 +58,7 @@
 	</script>
 <?php $this->end(); ?>
 <?php
-echo $this->Form->create(false, array('id' => 'searchForm', 'action' => '/index', 'class' => 'compressed'));
+echo $this->Form->create(false, array('id' => 'searchForm', 'url' => '/inmuebles/index', 'class' => 'compressed'));
 echo $this->Form->hidden('data_polygons', array('id' => 'dataPolygons', 'name' => 'data_polygons'));
 
 echo $this->Form->hidden('sortBy', array('name' => 'sortBy'));
@@ -101,15 +101,19 @@ $opcAvanzadas = (isset($this->request->data['opcionesAvanzadas_item']) && $this-
 		<div class="col-xs-4 col-sm-2">
 			<?php echo $this->Form->select('operacion', $operaciones, array('name' => 'operacion', 'class' => 'form-control', 'type' => 'number')); ?>
 		</div>
-		<div class="col-xs-4 col-sm-2">
+		<div class="col-xs-2 col-sm-1">
 			<?php echo $this->Form->select('habitaciones', $minimoDormitorios, array('name' => 'habitaciones', 'class' => 'form-control', 'label' => false)); ?>
 		</div>
-		<div class="col-xs-4 col-sm-2">
+		<div class="col-xs-2 col-sm-1">
 			<?php echo $this->Form->select('banos', $minimoBannos, array('name' => 'banos', 'class' => 'form-control', 'label' => false)); ?>
 		</div>
+        <div class="col-xs-4 col-sm-2">
+          <?php echo $this->Form->input('precio_min', array('name' => 'precio_min', 'class' => 'form-control', 'label' => false,
+                                                        'min' => 0, 'maxlength' => 10, 'placeholder' => 'precio m&iacute;nimo', 'escape' => false)); ?>
+        </div>
 		<div class="col-xs-4 col-sm-2">
 			<?php echo $this->Form->input('precio', array('name' => 'precio', 'class' => 'form-control', 'label' => false,
-				'min' => 0, 'max' => '3000000', 'maxlength' => 7, 'placeholder' => 'precio m&aacute;ximo', 'escape' => false)); ?>
+				'min' => 0, 'maxlength' => 10, 'placeholder' => 'precio m&aacute;ximo', 'escape' => false)); ?>
 		</div>
 	</div>
 

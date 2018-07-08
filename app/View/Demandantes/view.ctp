@@ -44,8 +44,8 @@ $this->end();
 				$this->Model->printIfExists($info, array('codigo_postal', 'poblacion', 'provincia'), array('label' => 'Municipio', 'model' => 'Demandante'));
 				$this->Model->printIfExists($info, 'direccion', array('label' => 'Direcci&oacute;n', 'model' => 'Demandante'));
 
-        $this->Model->printIfExists($info, '["HorarioContacto"]["description"]', array('label' => 'Horario de contacto', 'model' => 'expression'));
-        $this->Model->printIfExists($info, '["ClasificacionDemandante"]["description"]', array('label' => 'Clasificación', 'model' => 'expression'));
+                $this->Model->printIfExists($info, '["HorarioContacto"]["description"]', array('label' => 'Horario de contacto', 'model' => 'expression'));
+                $this->Model->printIfExists($info, '["ClasificacionDemandante"]["description"]', array('label' => 'Clasificación', 'model' => 'expression'));
 
 				$this->Model->printIfExists($info, 'observaciones', array('label' => 'Observaciones', 'model' => 'Demandante', 'format' => 'links_html'));
 
@@ -107,6 +107,7 @@ echo $this->Form->hidden('Demanda.subtipo', array('name' => 'subtipo'));
 echo $this->Form->hidden('Demanda.operacion', array('name' => 'operacion'));
 echo $this->Form->hidden('Demanda.habitaciones', array('name' => 'habitaciones'));
 echo $this->Form->hidden('Demanda.banos', array('name' => 'banos'));
+echo $this->Form->hidden('Demanda.precio_min', array('name' => 'precio_min'));
 echo $this->Form->hidden('Demanda.precio', array('name' => 'precio'));
 
 echo $this->Form->hidden('Demanda.estado_conservacion', array('name' => 'estado_conservacion'));
@@ -141,14 +142,17 @@ echo $this->Form->hidden('Demanda.no_ultimo', array('name' => 'no_ultimo'));
 	<div class="col-xs-4 col-sm-2">
 		<?php echo $this->Form->select('Demanda.operacion', $operaciones, array('class' => 'form-control', 'disabled' => 'disabled')); ?>
 	</div>
-	<div class="col-xs-4 col-sm-2">
-		<?php echo $this->Form->input('Demanda.habitaciones', array('class' => 'form-control', 'label' => false, 'disabled' => 'disabled', 'placeholder' => 'habitaciones')); ?>
+	<div class="col-xs-2 col-sm-1">
+		<?php echo $this->Form->input('Demanda.habitaciones', array('class' => 'form-control', 'label' => false, 'disabled' => 'disabled', 'placeholder' => 'dor')); ?>
 	</div>
-	<div class="col-xs-4 col-sm-2">
-		<?php echo $this->Form->input('Demanda.banos', array('class' => 'form-control', 'label' => false, 'disabled' => 'disabled', 'placeholder' => 'baños')); ?>
+	<div class="col-xs-2 col-sm-1">
+		<?php echo $this->Form->input('Demanda.banos', array('class' => 'form-control', 'label' => false, 'disabled' => 'disabled', 'placeholder' => 'bañ')); ?>
 	</div>
+    <div class="col-xs-4 col-sm-2">
+      <?php echo $this->Form->input('Demanda.precio_min', array('class' => 'form-control', 'label' => false, 'escape' => false, 'disabled' => 'disabled', 'placeholder' => 'precio min.')); ?>
+    </div>
 	<div class="col-xs-4 col-sm-2">
-		<?php echo $this->Form->input('Demanda.precio', array('class' => 'form-control', 'label' => false, 'escape' => false, 'disabled' => 'disabled', 'placeholder' => 'precio')); ?>
+		<?php echo $this->Form->input('Demanda.precio', array('class' => 'form-control', 'label' => false, 'escape' => false, 'disabled' => 'disabled', 'placeholder' => 'precio max.')); ?>
 	</div>
 </div>
 

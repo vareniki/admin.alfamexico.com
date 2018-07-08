@@ -2,44 +2,196 @@
 $this->start('header');
 ?>
 <script type="text/javascript">
+    var localizaciones = null;
 
-  $(document).ready(function() {
-	  $("#mapResult").empty();
+    /**
+     *
+     * @param loc
+     * @returns {Object}
+     */
+    function convertMap2Info(loc) {
+        var item = new Object();
 
-	  <?php if (!empty($info['Inmueble']['coord_x']) && !empty($info['Inmueble']['coord_y'])): ?>
-		  var latLng = "<?php echo $info['Inmueble']['coord_x'] . ',' . $info['Inmueble']['coord_y']; ?>";
-		  $("#mapResult").append(getMap({center: latLng, markers: latLng}));
-	  <?php endif; ?>
+        item.calle = "";
+        item.numero = "";
+        item.cp = "";
+        item.poblacion = "";
+        item.provincia = "";
+        item.direccion = "";
+        item.provincia_id = "";
 
-    $("#localizarInmueble").on("click", function() {
-      maps_dialog({
-        title: 'Geolocalizar propiedad',
-        pais: $("#InmueblePaisId option:selected").text()
-      }, function(item) {
-        /*
-         * Al pinchar aplicar se ejecuta esta función
-         */
-	      $("#mapResult").empty();
+        for (var j = 0; j < loc.address_components.length; j++) {
+            var obj = loc.address_components[j];
+            var type = obj['types'][0];
+            switch (type) {
+                case 'street_number':
+                    item.numero = loc.address_components[j]['long_name'];
+                    break;
+                case 'route':
+                    item.calle = loc.address_components[j]['long_name'];
+                    break;
+                case 'postal_code':
+                    item.cp = loc.address_components[j]['long_name'];
+                    item.provincia_id = item.cp.substr(0, 2);
+                    break;
+                case 'locality':
+                    item.poblacion = loc.address_components[j]['long_name'];
+                    break;
+                case 'administrative_area_level_1':
+                    if (item.provincia == '') {
+                        item.provincia = loc.address_components[j]['long_name'];
+                    }
+                    break;
+                case 'administrative_area_level_2':
+                    item.provincia = loc.address_components[j]['long_name'];
 
-	      if (item.lat != 0 && item.lng != 0) {
-		      var latLng = item.lat + "," + item.lng;
-		      $("#mapResult").append(getMap({center: latLng, markers: latLng}));
-	      }
-
-        $("#InmuebleCoordX").val(item.lat);
-        $("#InmuebleCoordY").val(item.lng);
-
-	      if ($("#InmuebleCodigoPostal").val() == '') {
-		      $("#InmuebleCodigoPostal").val(item.cp);
-	      }
-
-        if ($("#InmuebleNombreCalle").val() == '') {
-	        $("#InmuebleNombreCalle").val(item.calle);
-	        $("#InmuebleNumeroCalle").val(item.numero);
+                    break;
+            }
         }
+        item.lat = loc.geometry.location.lat;
+        item.lng = loc.geometry.location.lng;
+        item.direccion = loc.formatted_address;
 
-      });
-    });
+        return item;
+    }
+
+    /**
+     *
+     * @param direccion
+     * @param callback
+     */
+    var getMapAddresses = function (direccion, callback) {
+
+        $.ajax("<?php echo $this->base; ?>/ajax/getAddresses/?lugar=" + direccion, {
+            dataType: 'json',
+            success: function (data) {
+                $.each(data.results, function (i, obj) {
+                    callback(convertMap2Info(obj));
+                });
+            }
+        });
+    }
+
+    /**
+     *
+     * @returns {string}
+     */
+    function maps_get_html_dialog() {
+        var result = '<form id="buscarMapa_form" class="form-inline" action="#">';
+        result += '<div class="input-group">';
+        result += '<input type="text" class="form-control col-xs-12" id="buscarMapa_input" placeholder="ej.: tankah 65, cancun" autofocus>';
+        result += '<span class="input-group-btn"><button id="buscarMapa_button" class="btn btn-default" type="button">Buscar</button></span>';
+        result += '</div>';
+        result += '</form><br>';
+        result += '<div id="buscarMapa_results"></div>';
+
+        return result;
+    }
+
+    /**
+     *
+     * @param direccion
+     * @param pais
+     */
+    function maps_begin_search(direccion, pais) {
+        if (direccion.length < 3) {
+            return;
+        }
+        direccion += "," + pais;
+
+        localizaciones = Array();
+
+        $("#buscarMapa_results").empty();
+        getMapAddresses(direccion, function (item) {
+            localizaciones[localizaciones.length] = item;
+            var html = '<p><a class="bootbox-close-button" href="#" rel="' + localizaciones.length + '">' + item.direccion + '</a></p>';
+            $("#buscarMapa_results").append(html);
+        });
+
+    }
+
+    function maps_dialog(properties, callback) {
+        var dialog_obj = bootbox.dialog({
+            message: maps_get_html_dialog(properties.pais),
+            title: properties.title + ' en ' + properties.pais,
+            buttons: {
+            }
+        });
+
+        $("#buscarMapa_input").on("keyup", function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                maps_begin_search(this.value, properties.pais);
+            }
+        }).on("keypress", function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+            }
+        });
+
+        $("#buscarMapa_button").on("click", function () {
+            maps_begin_search($("#buscarMapa_input").val(), properties.pais);
+        });
+
+        $("#buscarMapa_results").on("click", "a", function () {
+            var id = parseInt(this.rel) - 1;
+            callback(localizaciones[id]);
+
+            return true;
+        });
+
+
+        $(dialog_obj).on('shown.bs.modal', function () {
+            $("#buscarMapa_input").focus();
+        });
+
+        return dialog_obj;
+    }
+
+</script>
+
+<script type="text/javascript">
+
+    var map;
+    function mapCallBack() {
+        map = new Microsoft.Maps.Map('#mapResult', {
+            disableZooming: true,
+            mapTypeId: Microsoft.Maps.MapTypeId.road, zoom: 15 });
+
+      <?php if (!empty($info['Inmueble']['coord_x']) && !empty($info['Inmueble']['coord_y'])): ?>
+        var center = new Microsoft.Maps.Location(<?php echo $info['Inmueble']['coord_x'] ?>, <?php echo $info['Inmueble']['coord_y'] ?>);
+        map.setView({center: center })
+
+        var pins = [];
+        pins.push(new Microsoft.Maps.Pushpin(center, { icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }));
+        map.entities.push(pins);
+
+        $("#mapResult").css('height', '200px');
+      <?php endif; ?>
+    }
+
+    function localizarInmuebleResult(item) {
+
+        map.entities.clear();
+        map.setView({ bounds: item.bestView });
+        map.entities.push(new Microsoft.Maps.Pushpin(item.location));
+
+        $("#InmuebleCoordX").val(item.location.latitude);
+        $("#InmuebleCoordY").val(item.location.longitude);
+
+        $("#InmuebleCodigoPostal").val(item.address.postalCode);
+
+        if (item.address.addressLine != null) {
+            var streetNumber = item.address.addressLine.split(',');
+            $("#InmuebleNombreCalle").val(streetNumber[0]);
+            if (streetNumber.length > 1) {
+                $("#InmuebleNumeroCalle").val(parseInt(streetNumber[1]));
+            }
+        }
+    }
+
+    $(document).ready(function() {
+	  $("#mapResult").empty();
 
 	  $("#InmuebleProvinciaId").on("change", function() {
 
@@ -125,6 +277,40 @@ $this->start('header');
 		  $("#buscarRC_modal").modal();
 	  });
 
+      $("#localizarInmueble").on("click", function() {
+          maps_dialog({
+              title: 'Geolocalizar propiedad',
+              pais: $("#InmueblePaisId option:selected").text()
+
+          }, function(item) {
+
+              /*
+               * Al pinchar aplicar se ejecuta esta función
+               */
+              $("#InmuebleCoordX").val(item.lat);
+              $("#InmuebleCoordY").val(item.lng);
+
+              $("#InmuebleCodigoPostal").val(item.cp);
+
+              $("#InmuebleNombreCalle").val(item.direccion);
+              $("#InmuebleNumeroCalle").val(item.numero);
+
+
+              if (item.lat != 0 && item.lng != 0) {
+
+                  var center = new Microsoft.Maps.Location(item.lat, item.lng);
+                  map.setView({center: center })
+
+                  var pins = [];
+                  pins.push(new Microsoft.Maps.Pushpin(center, { icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }));
+                  map.entities.push(pins);
+
+                  $("#mapResult").css('height', '200px');
+              }
+
+          });
+      });
+
   });
 </script>
 <?php
@@ -151,11 +337,17 @@ if ($info['Inmueble']['estado_inmueble_id'] >= '02') {
 	$click_rc = array();
 }
 ?>
+<div class="form-group" style="margin-bottom: 0;">
+    <div class="col-xs-5 col-lg-4 col-sm-4 text-right">&nbsp;</div>
+    <div class="controls col-xs-7 col-lg-8 col-sm-8">
+        <p class="text-info">Geolocaliza el inmueble y los datos se rellenan autom&aacute;ticamente</p>
+    </div>
+</div>
 <div class="form-group">
-	<label class="col-xs-5 col-lg-4 col-sm-4"></label>
-	<div class="controls col-xs-7 col-lg-8 col-sm-8">
-		<button class="btn btn-default btn-sm" type="button" id="localizarInmueble">Geolocalizar inmueble...</button>
-	</div>
+    <label class="col-xs-5 col-lg-4 col-sm-4"></label>
+    <div class="controls col-xs-7 col-lg-8 col-sm-8">
+        <button class="btn btn-default btn-sm" type="button" id="localizarInmueble">Geolocalizar inmueble...</button>
+    </div>
 </div>
 <?php
 echo $this->App->horizontalInput('Inmueble.coord_x', '<span>[*]</span> Latitud:', array('labelClass' => 'obligat'));
@@ -176,33 +368,36 @@ if (isset($tipoInmueble)) {
 	$escalera = '';
 	$piso = '';
 	$puerta = '';
-	switch ($info['Inmueble']['tipo_inmueble_id']) {
-		case '01':
-			$bloque = $info['Piso']['bloque'];
-			$escalera = $info['Piso']['escalera'];
-			$piso = $info['Piso']['piso'];
-			$puerta = $info['Piso']['puerta'];
-			break;
-		case '02':
-			break;
-		case '03':
-			$bloque = $info['Local']['bloque'];
-			break;
-		case '04':
-			$bloque = $info['Oficina']['bloque'];
-			$escalera = $info['Oficina']['escalera'];
-			$piso = $info['Oficina']['piso'];
-			$puerta = $info['Oficina']['puerta'];
-			break;
-		case '05':
-			break;
-		case '06':
-			break;
-		case '07':
-			break;
-		case '08':
-			break;
-	}
+	if (isset($info['Inmueble']['tipo_inmueble_id'])) {
+      switch ($info['Inmueble']['tipo_inmueble_id']) {
+        case '01':
+          $bloque = $info['Piso']['bloque'];
+          $escalera = $info['Piso']['escalera'];
+          $piso = $info['Piso']['piso'];
+          $puerta = $info['Piso']['puerta'];
+          break;
+        case '02':
+          break;
+        case '03':
+          $bloque = $info['Local']['bloque'];
+          break;
+        case '04':
+          $bloque = $info['Oficina']['bloque'];
+          $escalera = $info['Oficina']['escalera'];
+          $piso = $info['Oficina']['piso'];
+          $puerta = $info['Oficina']['puerta'];
+          break;
+        case '05':
+          break;
+        case '06':
+          break;
+        case '07':
+          break;
+        case '08':
+          break;
+      }
+    }
+
 	?>
 <?php endif; ?>
 <?php $this->end(); ?>

@@ -20,7 +20,7 @@ class AgentesController extends AppController {
 	public $uses = array( 'Agente', 'Pais' );
 	public $paginate = array(
 			'limit'     => 10,
-			'recursive' => 1,
+			'recursive' => 0,
 			'fields'    => array( 'Agente.*', 'User.active' ),
 			'order'     => array( 'Agente.id' => 'desc' )
 	);

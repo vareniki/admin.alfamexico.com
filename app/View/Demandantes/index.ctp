@@ -81,11 +81,52 @@ echo $this->Form->hidden('sortBy', array('name' => 'sortBy'));
     foreach ($info as $item) {
 
       $icons = '';
-	    if ($profile['is_central'] || $profile['is_agencia'] || ($profile['is_agente'] && $agente['Agente']['id'] == $item['Inmueble']['agente_id'])) {
+	    if ($profile['is_central'] || $profile['is_agencia'] || ($profile['is_agente'] && $agente['Agente']['id'] == $item['Agente']['id'])) {
         $icons .= $this->Html->link('<i class="glyphicon glyphicon-edit"></i> editar', 'edit/' . $item['Demandante']['id'] . '/' . $url_64, array('escape' => false));
       }
       $link = 'view/' . $item['Demandante']['id'] . '/' . $url_64;
-	    $baja = (!empty($item['Demandante']['fecha_baja'])) ? ' baja' : '';
+        $baja = (!empty($item['Demandante']['fecha_baja'])) ? ' baja' : '';
+
+        $clasificacion = '';
+        switch ($item['Demandante']['clasificacion_demandante_id']) {
+          case '01':
+            $clasificacion = 'corto plazo';
+            break;
+          case '02':
+              $clasificacion = 'medio plazo';
+              break;
+          case '03':
+            $clasificacion = 'largo plazo';
+            break;
+        }
+
+        $tipoInmueble = '';
+        switch ($item['Demanda']['tipo']) {
+          case '01':
+            $tipoInmueble = 'departamento';
+              break;
+          case '02':
+            $tipoInmueble = 'casa';
+            break;
+          case '03':
+            $tipoInmueble = 'local';
+            break;
+          case '04':
+            $tipoInmueble = 'oficina';
+            break;
+          case '05':
+            $tipoInmueble = 'estacionamiento';
+            break;
+          case '06':
+            $tipoInmueble = 'terreno';
+            break;
+          case '07':
+            $tipoInmueble = 'nave industrial';
+            break;
+          case '08':
+            $tipoInmueble = 'propiedad';
+            break;
+        }
 
       echo $this->Html->tableCells(array(
         $this->Html->link($item['Demandante']['referencia'], $link, array('escape' => false)),
@@ -95,11 +136,8 @@ echo $this->Form->hidden('sortBy', array('name' => 'sortBy'));
         $this->Html->link($item['Demandante']['provincia'], $link, array('escape' => false)),
 	      $this->Html->link($item['Demandante']['poblacion'], $link, array('escape' => false)),
 
-        ((isset($item['ClasificacionDemandante']['description'])) ?
-          $this->Html->link($item['ClasificacionDemandante']['description'], $link, array('escape' => false)) : ''),
-
-	      ((isset($item['Demanda']['TipoInmueble']['description'])) ?
-		      $this->Html->link($item['Demanda']['TipoInmueble']['description'], $link, array('escape' => false)) : ''),
+        ((!empty($clasificacion)) ? $this->Html->link($clasificacion, $link, array('escape' => false)) : ''),
+	    ((!empty($tipoInmueble)) ? $this->Html->link($tipoInmueble, $link, array('escape' => false)) : ''),
 
 	      ((isset($item['Demanda']['operacion'])) ?
 		      $this->Html->link($item['Demanda']['operacion'] . '.', $link, array('escape' => false)) : ''),
@@ -113,7 +151,7 @@ echo $this->Form->hidden('sortBy', array('name' => 'sortBy'));
 <div class="text-center">
   <ul class="pagination">
     <?php
-    $this->Paginator->options(array('action' => $this->passedArgs));
+    $this->Paginator->options(array('url' => $this->passedArgs));
     echo $this->Paginator->numbers();
     ?>
   </ul>

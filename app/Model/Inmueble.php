@@ -51,7 +51,14 @@ class Inmueble extends AppModel {
 					'foreignKey'            => 'inmueble_id',
 					'associationForeignKey' => 'portal_id',
 					'unique'                => 'keepExisting',
-			)
+			),
+      'NoPortal' => array(
+          'className' => 'Portal',
+          'joinTable' => 'inmuebles_portal_no',
+          'foreignKey' => 'inmueble_id',
+          'associationForeignKey' => 'portal_id',
+          'unique' => 'keepExisting',
+      )
 	);
 
 	/**
@@ -82,9 +89,6 @@ class Inmueble extends AppModel {
 			if ( isset( $info['precio_alquiler'] ) ) {
 				$info['precio_alquiler_ini'] = $info['precio_alquiler'];
 			}
-			if ( isset( $info['precio_traspaso'] ) ) {
-				$info['precio_traspaso_ini'] = $info['precio_traspaso'];
-			}
 		}
 		$estado = ( ! isset( $info['estado_inmueble_id'] ) ) ? '01' : $info['estado_inmueble_id'];
 
@@ -93,9 +97,6 @@ class Inmueble extends AppModel {
 		}
 		if ( empty( $info['es_alquiler'] ) ) {
 			$info['precio_alquiler'] = null;
-		}
-		if ( empty( $info['es_traspaso'] ) ) {
-			$info['precio_traspaso'] = null;
 		}
 
 		// Si el inmueble ha sido captado pero no tiene fecha entonces hay que asignarla la actual, y al contrario

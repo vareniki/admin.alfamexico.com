@@ -22,10 +22,10 @@
   </div>
 </div>
 <div class="oculto selec_punto_1">
-  <?php echo $this->App->horizontalInput('Terreno.numero', 'Número:', array('type' => 'number', 'maxlength' => '10', 'required' => 'required')); ?>
+  <?php echo $this->App->horizontalInput('Terreno.numero', 'Número:', array('type' => 'number', 'maxlength' => '10')); ?>
 </div>
 <div class="oculto selec_punto_2">
-  <?php echo $this->App->horizontalInput('Terreno.kilometro', 'Kilómetro:', array('type' => 'number', 'maxlength' => '10', 'required' => 'required')); ?>
+  <?php echo $this->App->horizontalInput('Terreno.kilometro', 'Kilómetro:', array('type' => 'number', 'maxlength' => '10')); ?>
 </div>
 <?php
 echo $this->App->horizontalInput('Terreno.numero_parcela', 'N. Parcela:', array('type' => 'number', 'maxlength' => '10'));

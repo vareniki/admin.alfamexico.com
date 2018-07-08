@@ -1,23 +1,25 @@
 <?php
 $title = __d('alfainmo_es', 'Alfa Inmobiliaria');
 
-$this->Html->script(array($this->App->getJQueryVersion(),
-	'bootstrap.min.js',
-	'bootstrap-datetimepicker.min',
-	'bootstrap-datetimepicker.es',
-  'http://cdn.jsdelivr.net/jquery.validation/1.13.1/jquery.validate.min.js',
-  'http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_es.js',
-	'jquery.form.min',
-	'jquery.html5-placeholder-shim'), array('inline' => false));
+$this->Html->script([
+    '//code.jquery.com/jquery-3.2.1.min.js',
+    '//netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+    'bootstrap-datetimepicker.min.js?ver=3.3.7',
+    'bootstrap-datetimepicker.es.js?ver=3.3.7',
+    '//cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js',
+    '//cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/localization/messages_es.js',
+    'jquery.form.min',
+    'jquery.html5-placeholder-shim'], ['inline' => false]);
 
-$this->Html->css(array(
-  'bootstrap.min.css', 'bootstrap-datetimepicker.min', 'alfainmo'), null, array('inline' => false));
+$this->Html->css([
+  '//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', 'bootstrap-datetimepicker.min', 'alfainmo'], null, ['inline' => false]);
 ?> 
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <?php echo $this->Html->charset(); ?>
     <title><?php echo $title_for_layout . ' : ' . $title ?></title>
+      <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AlbfYmi5eFUj9sj8Rh5tjTbeM00HeglGuPJZnfYFtDz7KiRfwedBBucu-mMpTRLa&callback=mapCallBack' async defer></script>
     <?php
     echo $this->Html->meta('icon');
 
@@ -26,12 +28,6 @@ $this->Html->css(array(
     echo $this->fetch('script');
     echo $this->fetch('header');
     ?>
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="<?php echo $this->Html->url('/'); ?>js/html5shiv.js"></script>
-      <script src="<?php echo $this->Html->url('/'); ?>js/respond.min.js"></script>
-    <![endif]-->
-    <meta http-equiv="X-UA-Compatible" content="IE=9" />
     <script type="text/javascript">
 
       var fields_changed = false;
@@ -69,6 +65,18 @@ $this->Html->css(array(
         });
       });
     </script>
+
+      <!-- Start of Smartsupp Live Chat script -->
+      <script type="text/javascript">
+          var _smartsupp = _smartsupp || {};
+          _smartsupp.key = '09a4e528fc69833a3265efe4b6d678f6d85e2380';
+          window.smartsupp||(function(d) {
+              var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+              s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+              c.type='text/javascript';c.charset='utf-8';c.async=true;
+              c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+          })(document);
+      </script>
 
   </head>
   <body id="<?php echo strtolower('main-' . $this->name . '-' . $this->view); ?>" class="main-<?php echo strtolower($this->name) ?>">

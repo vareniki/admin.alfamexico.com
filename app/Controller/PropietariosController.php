@@ -20,7 +20,7 @@ class PropietariosController extends AppController {
 	public $uses = array( 'Propietario', 'Contacto', 'Pais', 'HorarioContacto', 'TipoEvento' );
 	public $paginate = array(
 			'limit'     => 10,
-			'recursive' => 1,
+			'recursive' => 0,
 			'fields'    => array(
 					'Propietario.*',
 					'Inmueble.id',
@@ -29,7 +29,7 @@ class PropietariosController extends AppController {
 					'Inmueble.codigo',
 					'Inmueble.agente_id'
 			),
-			'order'     => array( 'Propietario.id' => 'desc' )
+			'order' => array( 'Propietario.id' => 'desc' )
 	);
 
 	private function getPaises() {
@@ -77,44 +77,39 @@ class PropietariosController extends AppController {
 	/**
 	 *
 	 */
-	public function index() {
+  public function index() {
 
-		if ( $this->request->is( 'post' ) ) {
-			$this->passedArgs = $this->request->data;
-		} elseif ( ! empty( $this->passedArgs ) ) {
-			$this->request->data = $this->passedArgs;
-		}
-		$agencia = $this->viewVars['agencia']['Agencia'];
+    if ($this->request->is('post')) {
+      $this->passedArgs = $this->request->data;
+    } elseif (!empty($this->passedArgs)) {
+      $this->request->data = $this->passedArgs;
+    }
+    $agencia = $this->viewVars['agencia']['Agencia'];
 
-		$search                        = $this->PersonasInfo->crearBusqueda( $this->request->data, 'Propietario' );
-		$search['Inmueble.agencia_id'] = $agencia['id'];
+    $search = $this->PersonasInfo->crearBusqueda($this->request->data, 'Propietario');
+    $search['Inmueble.agencia_id'] = $agencia['id'];
 
-		if ( $this->isAgente() && ! $this->isCoordinador() ) {
-			$agente                       = $this->viewVars['agente']['Agente'];
-			$search['Inmueble.agente_id'] = $agente['id'];
-		}
+    if (!empty($this->passedArgs['sortBy'])) {
+      $sortBy = explode(' ', $this->passedArgs['sortBy']);
+      if (!isset($sortBy[1])) {
+        $sortBy[1] = 'asc';
+      }
 
-		if ( ! empty( $this->passedArgs['sortBy'] ) ) {
-			$sortBy = explode( ' ', $this->passedArgs['sortBy'] );
-			if ( ! isset( $sortBy[1] ) ) {
-				$sortBy[1] = 'asc';
-			}
+      switch ($sortBy[0]) {
+        case 'referencia':
+          $this->paginate['order'] = array('Inmueble.numero_agencia' => 'asc', 'Inmueble.codigo' => 'asc');
+          break;
+        default:
+          if (strpos($sortBy[0], '.') === false) {
+            $sortBy[0] = 'Propietario.' . $sortBy[0];
+          }
+          $this->paginate['order'] = array($sortBy[0] => $sortBy[1]);
+      }
+    }
 
-			switch ( $sortBy[0] ) {
-				case 'referencia':
-					$this->paginate['order'] = array( 'Inmueble.numero_agencia' => 'asc', 'Inmueble.codigo' => 'asc' );
-					break;
-				default:
-					if ( strpos( $sortBy[0], '.' ) === false ) {
-						$sortBy[0] = 'Propietario.' . $sortBy[0];
-					}
-					$this->paginate['order'] = array( $sortBy[0] => $sortBy[1] );
-			}
-		}
-
-		$this->Paginator->settings = $this->paginate;
-		$this->set( 'info', $this->Paginator->paginate( 'Propietario', $search ) );
-	}
+    $this->Paginator->settings = $this->paginate;
+    $this->set('info', $this->Paginator->paginate('Propietario', $search));
+  }
 
 	/**
 	 * @param null $id

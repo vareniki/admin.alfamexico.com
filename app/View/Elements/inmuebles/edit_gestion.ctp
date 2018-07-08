@@ -30,11 +30,17 @@ echo $this->App->horizontalSelect('Inmueble.medio_captacion_id', 'Medio de capta
     <?php
     echo $this->Form->input('Inmueble.honor_agencia', array(
       'type' => 'number', 'min' => 1, 'max' => 100000000, 'class' => 'form-control', 'label' => false));
-    ?>
+    ?><br>
+        <a data-toggle="collapse" data-target="#tablaComisiones" aria-expanded="false" aria-controls="tablaComisiones">Visualizar tabla de comisiones.</a>
   </div>
   <div class="controls col-xs-2 col-lg-2 col-sm-2">
     <?php echo $this->Form->select('Inmueble.honor_agencia_unid', array('%' => '%', 'e' => $moneda), array('class' => 'form-control', 'label' => false)); ?>
   </div>
+</div>
+<div class="collapse text-right" id="tablaComisiones">
+    <div class="well">
+      <?php echo $this->Html->image('tabla-comisiones.png'); ?><br>
+    </div>
 </div>
 <?php /* if ($info['Inmueble']['tipo_contrato_id'] != 'PV') { ?>
 <div class="form-group">
@@ -128,9 +134,33 @@ echo $this->App->horizontalInput('Inmueble.llaves', 'Observaciones llaves:', arr
     ?>
   </div>
 </div>
-	<div class="row">
+    <div class="row">
 		<div class="col-xs-5 col-lg-4 col-sm-4"></div>
 		<div class="col-xs-7 col-lg-8 col-sm-8"><p class="text-info"><em>use tecla "control" para seleccionar o desmarcar varios portales.</em></p></div>
 	</div>
+    <div class="row">
+        <div class="col-xs-12">
+        <hr>
+        <p class="text-center"><em>Todo inmueble disponible (B&aacute;sico, Integral y Digital), se anuncia en todos los portales aliados,
+                para NO PUBLICAR en alg&uacute;n sitio puedes usar esta opci&oacute;n.</em></p>
+        <hr>
+        </div>
+    </div>
 <?php
-echo $this->App->horizontalSelect('Inmueble.Portal', 'Destacados:', $portales, array('multiple' => 'multiple'));
+echo $this->App->horizontalSelect('Inmueble.NoPortal', 'No publicar en:', $noPortales, array('multiple' => 'multiple', 'size' => 6)); ?>
+    <div class="row">
+        <div class="col-xs-12">
+        <hr>
+            <p class="text-center"><em>La contrataci&oacute;n directa con los portales, tiene un costo extra.</em></p>
+        <hr>
+        </div>
+    </div>
+<?php
+echo $this->App->horizontalSelect('Inmueble.Portal', 'Paquetes Adicionales (Oro, Premium, Destacados):', $portales, array('multiple' => 'multiple', 'size' => 6)); ?>
+<div class="row">
+    <div class="col-xs-12">
+    <p class="alert alert-info" role="alert">Antes de usar cualquiera de estas dos opciones, comun&iacute;cate a la Central
+        para recibir m&aacute;s informaci&oacute;n de las mismas.<br>El mal uso de estas opciones puede afectar a tus inmuebles.</p>
+    </div>
+</div>
+

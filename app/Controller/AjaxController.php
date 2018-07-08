@@ -52,7 +52,24 @@ class AjaxController extends AppController {
 		} );
 	}
 
-	/**
+  /**
+   *
+   */
+  public function getAddresses() {
+
+    $this->layout     = null;
+    $this->autoRender = false;
+
+    $params = $this->request->query;
+    $lugar = urlencode($params['lugar']);
+
+    $url = "https://maps.googleapis.com/maps/api/geocode/json?address=$lugar&sensor=false&key=AIzaSyAr6xxQvPWvBslfoELkCuWznJ9Kw4j9-9c";
+    $json = @file_get_contents( $url );
+    echo $json;
+  }
+
+
+  /**
 	 * @param $conditions
 	 *
 	 * @return mixed
@@ -190,7 +207,7 @@ class AjaxController extends AppController {
 			);
 		}
 
-		$conditions['Inmueble.agencia_id'] = $agencia_id;
+		//$conditions['Inmueble.agencia_id'] = $agencia_id;
 		if ( $altas ) {
 			$conditions[] = 'Inmueble.fecha_baja IS NULL';
 		}
@@ -209,11 +226,9 @@ class AjaxController extends AppController {
 						'TipoInmueble.description',
 						'Inmueble.es_venta',
 						'Inmueble.es_alquiler',
-						'Inmueble.es_traspaso',
 						'Inmueble.es_opcion_compra',
 						'Inmueble.precio_venta',
 						'Inmueble.precio_alquiler',
-						'Inmueble.precio_traspaso',
 						'Inmueble.poblacion',
 						'Inmueble.provincia',
 						'Inmueble.nombre_calle',
@@ -547,174 +562,174 @@ class AjaxController extends AppController {
 		$this->set( 'eventos', $this->getEventos( $conditions ) );
 	}
 
-	/*
-	 * Demandantes por inmueble
-	 */
+  public function getDemandasInmueble() {
+    if (!$this->request->is('ajax')) {
+      return;
+    }
 
-	public function getDemandasInmueble() {
-		if ( ! $this->request->is( 'ajax' ) ) {
-			return;
-		}
+    $inmueble = $this->Inmueble->find('first', array(
+        'conditions' => array('Inmueble.id' => $this->request->data['inmueble_id']), 'recursive' => 1));
 
-		$inmueble = $this->Inmueble->find( 'first', array(
-				'conditions' => array( 'Inmueble.id' => $this->request->data['inmueble_id'] ),
-				'recursive'  => 1
-		) );
+    if (empty($inmueble['Inmueble']['coord_x']) || empty($inmueble['Inmueble']['coord_y'])) {
+      $this->set('info', array());
+      return;
+    }
 
-		if ( empty( $inmueble['Inmueble']['coord_x'] ) || empty( $inmueble['Inmueble']['coord_y'] ) ) {
-			$this->set( 'info', array() );
+    $busq = array();
+    switch ($inmueble['Inmueble']['tipo_inmueble_id']) {
+      case '01': // piso
+        $subtipo = 'Piso';
+        $busq['subtipo'] = $inmueble['Piso']['tipo_piso_id'];
+        break;
+      case '02': // chalet
+        $subtipo = 'Chalet';
+        $busq['subtipo'] = $inmueble['Chalet']['tipo_chalet_id'];
+        break;
+      case '03': // local
+        $subtipo = 'Local';
+        $busq['subtipo'] = null;
+        break;
+      case '04': // oficina
+        $subtipo = 'Oficina';
+        $busq['subtipo'] = $inmueble['Oficina']['tipo_oficina_id'];
+        break;
+      case '05': // garaje
+        $subtipo = 'Garaje';
+        $busq['subtipo'] = $inmueble['Garaje']['tipo_garaje_id'];
+        break;
+      case '06': // terreno
+        $subtipo = 'Terreno';
+        $busq['subtipo'] = $inmueble['Terreno']['tipo_terreno_id'];
+        break;
+      case '07': // nave
+        $subtipo = 'Nave';
+        $busq['subtipo'] = null;
+        break;
+      case '08': // otro
+        $subtipo = 'Otro';
+        $busq['subtipo'] = null;
+        break;
 
-			return;
-		}
+    }
+    $busq['tipo_equipamiento'] = (isset($inmueble[$subtipo]['tipo_equipamiento_id'])) ? $inmueble[$subtipo]['tipo_equipamiento_id'] : null;
+    $busq['tipo_calefaccion'] = (isset($inmueble[$subtipo]['tipo_calefaccion_id'])) ? $inmueble[$subtipo]['tipo_calefaccion_id'] : null;
+    $busq['estado_conservacion'] = (isset($inmueble[$subtipo]['estado_conservacion_id'])) ? $inmueble[$subtipo]['estado_conservacion_id'] : null;
+    $busq['habitaciones'] = (isset($inmueble[$subtipo]['numero_habitaciones'])) ? $inmueble[$subtipo]['numero_habitaciones'] : null;
+    $busq['banos'] = (isset($inmueble[$subtipo]['numero_banos'])) ? $inmueble[$subtipo]['numero_banos'] : null;
 
-		$busq = array();
-		switch ( $inmueble['Inmueble']['tipo_inmueble_id'] ) {
-			case '01': // piso
-				$subtipo         = 'Piso';
-				$busq['subtipo'] = $inmueble['Piso']['tipo_piso_id'];
-				break;
-			case '02': // chalet
-				$subtipo         = 'Chalet';
-				$busq['subtipo'] = $inmueble['Chalet']['tipo_chalet_id'];
-				break;
-			case '03': // local
-				$subtipo         = 'Local';
-				$busq['subtipo'] = null;
-				break;
-			case '04': // oficina
-				$subtipo         = 'Oficina';
-				$busq['subtipo'] = $inmueble['Oficina']['tipo_oficina_id'];
-				break;
-			case '05': // garaje
-				$subtipo         = 'Garaje';
-				$busq['subtipo'] = $inmueble['Garaje']['tipo_garaje_id'];
-				break;
-			case '06': // terreno
-				$subtipo         = 'Terreno';
-				$busq['subtipo'] = $inmueble['Terreno']['tipo_terreno_id'];
-				break;
-			case '07': // nave
-				$subtipo         = 'Nave';
-				$busq['subtipo'] = null;
-				break;
-			case '08': // otro
-				$subtipo         = 'Otro';
-				$busq['subtipo'] = null;
-				break;
+    $busq['con_piscina'] = (isset($inmueble[$subtipo]['con_piscina'])) ? $inmueble[$subtipo]['con_piscina'] : null;
+    $busq['con_trastero'] = (isset($inmueble[$subtipo]['con_trastero'])) ? $inmueble[$subtipo]['con_trastero'] : null;
 
-		}
-		$busq['tipo_equipamiento']   = ( isset( $inmueble[ $subtipo ]['tipo_equipamiento_id'] ) ) ? $inmueble[ $subtipo ]['tipo_equipamiento_id'] : null;
-		$busq['tipo_calefaccion']    = ( isset( $inmueble[ $subtipo ]['tipo_calefaccion_id'] ) ) ? $inmueble[ $subtipo ]['tipo_calefaccion_id'] : null;
-		$busq['estado_conservacion'] = ( isset( $inmueble[ $subtipo ]['estado_conservacion_id'] ) ) ? $inmueble[ $subtipo ]['estado_conservacion_id'] : null;
-		$busq['habitaciones']        = ( isset( $inmueble[ $subtipo ]['numero_habitaciones'] ) ) ? $inmueble[ $subtipo ]['numero_habitaciones'] : null;
-		$busq['banos']               = ( isset( $inmueble[ $subtipo ]['numero_banos'] ) ) ? $inmueble[ $subtipo ]['numero_banos'] : null;
+    if (isset($inmueble[$subtipo]['plazas_parking'])) {
+      $busq['con_garaje'] = ((int)$inmueble[$subtipo]['plazas_parking'] > 0) ? 't' : 'f';
+    } else {
+      $busq['con_garaje'] = null;
+    }
+    if (isset($inmueble[$subtipo]['numero_ascensores'])) {
+      $busq['con_ascensor'] = ((int)$inmueble[$subtipo]['numero_ascensores'] > 0) ? 't' : 'f';
+    } else {
+      $busq['con_ascensor'] = null;
+    }
+    if (isset($inmueble[$subtipo]['tipo_aa_id'])) {
+      $busq['con_aire'] = ($inmueble[$subtipo]['tipo_aa_id'] >= '01') ? 't' : 'f';
+    } else {
+      $busq['con_aire'] = null;
+    }
 
-		$busq['con_piscina']  = ( isset( $inmueble[ $subtipo ]['con_piscina'] ) ) ? $inmueble[ $subtipo ]['con_piscina'] : null;
-		$busq['con_trastero'] = ( isset( $inmueble[ $subtipo ]['con_trastero'] ) ) ? $inmueble[ $subtipo ]['con_trastero'] : null;
+    $busq['piso'] = (isset($inmueble[$subtipo]['piso'])) ? $inmueble[$subtipo]['piso'] : null;
+    $busq['plantas_edificio'] = (isset($inmueble[$subtipo]['plantas_edificio']) && (int) $inmueble[$subtipo]['plantas_edificio'] > 0) ? (int) $inmueble[$subtipo]['plantas_edificio'] : null;
 
-		if ( isset( $inmueble[ $subtipo ]['plazas_parking'] ) ) {
-			$busq['con_garaje'] = ( (int) $inmueble[ $subtipo ]['plazas_parking'] > 0 ) ? 't' : 'f';
-		} else {
-			$busq['con_garaje'] = null;
-		}
-		if ( isset( $inmueble[ $subtipo ]['numero_ascensores'] ) ) {
-			$busq['con_ascensor'] = ( (int) $inmueble[ $subtipo ]['numero_ascensores'] > 0 ) ? 't' : 'f';
-		} else {
-			$busq['con_ascensor'] = null;
-		}
-		if ( isset( $inmueble[ $subtipo ]['tipo_aa_id'] ) ) {
-			$busq['con_aire'] = ( $inmueble[ $subtipo ]['tipo_aa_id'] >= '01' ) ? 't' : 'f';
-		} else {
-			$busq['con_aire'] = null;
-		}
+    if ($inmueble['Inmueble']['es_promocion'] == 't') {
+      $busq['anios'] = 'on';
+    } else {
+      $busq['anios'] = (isset($inmueble[$subtipo]['anio_construccion'])) ? ((int) date('Y')) - $inmueble[$subtipo]['anio_construccion'] : null;
+    }
 
-		$busq['piso']             = ( isset( $inmueble[ $subtipo ]['piso'] ) ) ? $inmueble[ $subtipo ]['piso'] : null;
-		$busq['plantas_edificio'] = ( isset( $inmueble[ $subtipo ]['plantas_edificio'] ) && (int) $inmueble[ $subtipo ]['plantas_edificio'] > 0 ) ? (int) $inmueble[ $subtipo ]['plantas_edificio'] : null;
+    $conditions = array();
 
-		if ( $inmueble['Inmueble']['es_promocion'] == 't' ) {
-			$busq['anios'] = 'on';
-		} else {
-			$busq['anios'] = ( isset( $inmueble[ $subtipo ]['anio_construccion'] ) ) ? ( (int) date( 'Y' ) ) - $inmueble[ $subtipo ]['anio_construccion'] : null;
-		}
+    $conditions[] = 'Demandante.fecha_baja IS NULL';
+    $conditions['Demanda.tipo'] = $inmueble['Inmueble']['tipo_inmueble_id'];
 
-		$conditions = array();
-		//$conditions['Demandante.agencia_id'] = $this->viewVars['agencia']['Agencia']['id'];
-		$conditions[]               = 'Demandante.fecha_baja IS NULL';
-		$conditions['Demanda.tipo'] = $inmueble['Inmueble']['tipo_inmueble_id'];
+    if ($inmueble['Inmueble']['es_venta'] == 't') {
 
-		if ( $inmueble['Inmueble']['es_venta'] == 't' ) {
+      $conditions['Demanda.operacion'] = 'ven';
+      $conditions[] = '(Demanda.precio >= ' . $inmueble['Inmueble']['precio_venta'] . ' OR Demanda.precio IS NULL)';
+      $conditions[] = '(Demanda.precio_min <= ' . $inmueble['Inmueble']['precio_venta'] . ' OR Demanda.precio_min IS NULL)';
 
-			$conditions['Demanda.operacion'] = 'ven';
-			$conditions[]                    = '(Demanda.precio >= ' . $inmueble['Inmueble']['precio_venta'] . ' OR Demanda.precio IS NULL)';
+    } else if ($inmueble['Inmueble']['es_alquiler'] == 't') {
 
-		} else if ( $inmueble['Inmueble']['es_alquiler'] == 't' ) {
+      $conditions['Demanda.operacion'] = 'alq';
+      $conditions[] = '(Demanda.precio >= ' . $inmueble['Inmueble']['precio_alquiler'] . ' OR Demanda.precio IS NULL)';
+      $conditions[] = '(Demanda.precio_min <= ' . $inmueble['Inmueble']['precio_alquiler'] . ' OR Demanda.precio_min IS NULL)';
 
-			$conditions['Demanda.operacion'] = 'alq';
-			$conditions[]                    = '(Demanda.precio >= ' . $inmueble['Inmueble']['precio_alquiler'] . ' OR Demanda.precio IS NULL)';
+    } else if ($inmueble['Inmueble']['es_traspaso'] == 't') {
 
-		} else if ( $inmueble['Inmueble']['es_traspaso'] == 't' ) {
+      $conditions['Demanda.operacion'] = 'tra';
+      $conditions[] = '(Demanda.precio >= ' . $inmueble['Inmueble']['precio_traspaso'] . ' OR Demanda.precio IS NULL)';
+      $conditions[] = '(Demanda.precio_min <= ' . $inmueble['Inmueble']['precio_traspaso'] . ' OR Demanda.precio_min IS NULL)';
+    }
 
-			$conditions['Demanda.operacion'] = 'tra';
-			$conditions[]                    = '(Demanda.precio >= ' . $inmueble['Inmueble']['precio_traspaso'] . ' OR Demanda.precio IS NULL)';
-		}
+    if ($busq['subtipo'] == null) {
+      $conditions[] = "(Demanda.subtipo = '" . $busq['subtipo'] . "' OR Demanda.subtipo IS NULL OR Demanda.subtipo = '')";
+    }
+    if ($busq['tipo_equipamiento'] != null) {
+      $conditions[] = "(Demanda.tipo_equipamiento = '" . $busq['tipo_equipamiento'] . "' OR Demanda.tipo_equipamiento IS NULL OR Demanda.tipo_equipamiento = '')";
+    }
+    if ($busq['tipo_calefaccion'] != null) {
+      $conditions[] = "(Demanda.tipo_calefaccion = '" . $busq['tipo_calefaccion'] . "' OR Demanda.tipo_calefaccion IS NULL OR Demanda.tipo_calefaccion = '')";
+    }
+    if ($busq['estado_conservacion'] != null) {
+      $conditions[] = "(Demanda.estado_conservacion = '" . $busq['estado_conservacion'] . "' OR Demanda.estado_conservacion IS NULL OR Demanda.estado_conservacion = '')";
+    }
+    if ($busq['habitaciones'] != null) {
+      $conditions[] = "(Demanda.habitaciones <= " . (int) $busq['habitaciones'] . " OR Demanda.habitaciones IS NULL)";
+    }
+    if ($busq['banos'] != null) {
+      $conditions[] = "(Demanda.banos <= " . (int) $busq['banos'] . " OR Demanda.banos IS NULL)";
+    }
+    if ($busq['anios'] != null) {
+      if ($busq['anios'] == 'on') {
+        $conditions[] = "(Demanda.anios = 'on' OR Demanda.anios IS NULL OR Demanda.anios = '')";
+      } else {
+        $conditions[] = "(Demanda.anios >= '" . $busq['anios']  . "' OR Demanda.anios IS NULL OR Demanda.anios = '')";
+      }
+    }
+    // Comprobar no bajo y no último
+    if ($busq['piso'] != null) {
+      if ($busq['piso'] == '00') { // Bajo
+        $conditions[] = "Demanda.no_bajo <> 't'";
+      } else if ($busq['plantas_edificio'] != null && (int) $busq['plantas_edificio'] == (int) $busq['piso']) { // último
+        $conditions[] = "Demanda.no_ultimo <> 't'";
+      }
+    }
 
-		if ( $busq['subtipo'] == null ) {
-			$conditions[] = "(Demanda.subtipo = '" . $busq['subtipo'] . "' OR Demanda.subtipo IS NULL OR Demanda.subtipo = '')";
-		}
-		if ( $busq['tipo_equipamiento'] != null ) {
-			$conditions[] = "(Demanda.tipo_equipamiento = '" . $busq['tipo_equipamiento'] . "' OR Demanda.tipo_equipamiento IS NULL OR Demanda.tipo_equipamiento = '')";
-		}
-		if ( $busq['tipo_calefaccion'] != null ) {
-			$conditions[] = "(Demanda.tipo_calefaccion = '" . $busq['tipo_calefaccion'] . "' OR Demanda.tipo_calefaccion IS NULL OR Demanda.tipo_calefaccion = '')";
-		}
-		if ( $busq['estado_conservacion'] != null ) {
-			$conditions[] = "(Demanda.estado_conservacion = '" . $busq['estado_conservacion'] . "' OR Demanda.estado_conservacion IS NULL OR Demanda.estado_conservacion = '')";
-		}
-		if ( $busq['habitaciones'] != null ) {
-			$conditions[] = "(Demanda.habitaciones <= " . (int) $busq['habitaciones'] . " OR Demanda.habitaciones IS NULL)";
-		}
-		if ( $busq['banos'] != null ) {
-			$conditions[] = "(Demanda.banos <= " . (int) $busq['banos'] . " OR Demanda.banos IS NULL)";
-		}
-		if ( $busq['anios'] != null ) {
-			if ( $busq['anios'] == 'on' ) {
-				$conditions[] = "(Demanda.anios = 'on' OR Demanda.anios IS NULL OR Demanda.anios = '')";
-			} else {
-				$conditions[] = "(Demanda.anios >= '" . $busq['anios'] . "' OR Demanda.anios IS NULL OR Demanda.anios = '')";
-			}
-		}
-		// Comprobar no bajo y no último
-		if ( $busq['piso'] != null ) {
-			if ( $busq['piso'] == '00' ) { // Bajo
-				$conditions[] = "Demanda.no_bajo <> 't'";
-			} else if ( $busq['plantas_edificio'] != null && (int) $busq['plantas_edificio'] == (int) $busq['piso'] ) { // último
-				$conditions[] = "Demanda.no_ultimo <> 't'";
-			}
-		}
+    $busq_con = array('con_garaje', 'con_trastero', 'con_ascensor', 'con_piscina', 'con_aire');
+    foreach ($busq_con as $con) {
+      if ($busq[$con] != null && $busq[$con] == 'f') {
+        $conditions[] = "Demanda.$con <> 't'";
+      }
+    }
 
-		$busq_con = array( 'con_garaje', 'con_trastero', 'con_ascensor', 'con_piscina', 'con_aire' );
-		foreach ( $busq_con as $con ) {
-			if ( $busq[ $con ] != null && $busq[ $con ] == 'f' ) {
-				$conditions[] = "Demanda.$con <> 't'";
-			}
-		}
+    // Agencias activas y no central
+    $conditions['Agencia.active'] = 't';
 
-		// Agencias activas y no central
-		$conditions['Agencia.active'] = 't';
-		$conditions[]                 = "Agencia.solo_central <> 't'";
+    $subconds = [];
+    $subconds['Demandante.agencia_id'] = $this->viewVars['agencia']['Agencia']['id'];
+    $subconds[] = "Agencia.solo_central <> 't'";
 
-		// Lugar
-		$coord_x = $inmueble['Inmueble']['coord_x'];
-		$coord_y = $inmueble['Inmueble']['coord_y'];
+    $subconds_or[] = array('OR' => $subconds);
+    $conditions[] = $subconds_or;
+    // Lugar
+    $coord_x = $inmueble['Inmueble']['coord_x'];
+    $coord_y = $inmueble['Inmueble']['coord_y'];
 
-		$conditions[] = "Demanda.data_polygons <> '' AND polygon(Demanda.data_polygons) @> point($coord_x,$coord_y)";
+    //$conditions[] = "Demanda.data_polygons <> '' AND strpos(Demanda.data_polygons, E'\n') = 0 AND polygon(Demanda.data_polygons) @> point($coord_x,$coord_y)";
+    $conditions[] = "Demanda.data_polygons IS NOT NULL AND Demanda.data_polygons <> '' AND polygon(Demanda.data_polygons) @> point($coord_x,$coord_y)";
 
-		$info = $this->Demandante->find( 'all', array(
-				'order'      => 'Demandante.agencia_id, Demandante.nombre_contacto',
-				'conditions' => $conditions
-		) );
+    $info = $this->Demandante->find('all', array(
+        'order' => 'Demandante.agencia_id, Demandante.nombre_contacto',	'conditions' => $conditions));
 
-		$this->set( 'info', $info );
-	}
+    $this->set('info', $info);
+  }
 
 }

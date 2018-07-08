@@ -47,6 +47,13 @@ class AgenciasController extends AppController {
 		}, false );
 	}
 
+  private function getNoPortales() {
+    $CI = $this;
+    return $this->Alfa->getTypologyInfo('Portal', function() use ($CI) {
+      return $CI->Portal->find('all', array('order' => 'id', 'callbacks' => false, 'conditions' => array('excluir' => 't')));
+    }, false);
+  }
+
 	private function getPortales() {
 		$CI = $this;
 
@@ -122,7 +129,10 @@ class AgenciasController extends AppController {
 			$this->request->data['referer'] = $url_64;
 		}
 
-		$info = $this->Agencia->find( 'first', array( 'conditions' => array( 'Agencia.id' => $id ), 'recursive' => 2 ) );
+    $info = $this->Agencia->find('first', array(
+        'fields' => array('Agencia.*', 'Pais.*'),
+        'conditions' => array('Agencia.id' => $id),
+        'recursive' => 0));
 		$this->set( 'info', $info );
 	}
 
@@ -164,7 +174,7 @@ class AgenciasController extends AppController {
 		} else {
 			$this->set( 'poblaciones_ids', array( '' => '(seleccionar municipio)' ) );
 		}
-		$this->set( 'portales', $this->getPortales() );
+		$this->set( 'portales', $this->getNoPortales() );
 
 		$this->request->data['Agencia']['pais_id'] = 18; // México
 		$this->view                                = '/Agencias/edit';
@@ -210,13 +220,16 @@ class AgenciasController extends AppController {
 			}
 		}
 
-		$info = $this->Agencia->find( 'first', array( 'conditions' => array( 'Agencia.id' => $id ), 'recursive' => 2 ) );
+    $info = $this->Agencia->find('first', array(
+        'fields' => array('Agencia.*', 'User.*'),
+        'conditions' => array('Agencia.id' => $id),
+        'recursive' => 1));
 
 		$this->set( 'paises', $this->getPaises() );
 		$this->set( 'provincias_ids', array( '' => '(seleccionar estado)' ) + $this->getProvincias() );
-		$this->set( 'portales', $this->getPortales() );
+		$this->set( 'portales', $this->getNoPortales() );
 
-		$this->request->data            = $info;
+		$this->request->data = $info;
 		$this->request->data['referer'] = $url_64;
 
 		$this->set( 'info', $info );

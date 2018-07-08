@@ -9,7 +9,6 @@ echo $this->App->horizontalRadio('Oficina.tipo_oficina_id', '<span>[*]</span> Ti
     <?php
     echo $this->Form->checkbox('Inmueble.es_venta', array('value' => 't', 'label' => 'venta'));
     echo $this->Form->checkbox('Inmueble.es_alquiler', array('value' => 't', 'label' => 'renta'));
-    echo $this->Form->checkbox('Inmueble.es_traspaso', array('value' => 't', 'label' => 'traspaso'));
     echo '<br>';
     echo $this->Form->checkbox('Inmueble.es_promocion', array('value' => 't', 'label' => 'desarrollo'));
     ?>
@@ -28,15 +27,12 @@ echo $this->App->horizontalInput('Inmueble.entrega_promocion', 'Entrega aproxima
     'type' => 'number', 'required' => true, 'min' => 100, 'max' => 9999999999, 'divClass' => 'oculto InmuebleEsVenta', 'labelClass' => 'obligat'));
   echo $this->App->horizontalInput('Inmueble.precio_alquiler', '<span>[*]</span> Precio de renta:', array(
     'type' => 'number', 'required' => true, 'min' => 10, 'max' => 9999999, 'divClass' => 'oculto InmuebleEsAlquiler', 'labelClass' => 'obligat'));
-  echo $this->App->horizontalInput('Inmueble.precio_traspaso', '<span>[*]</span> Precio de traspaso:', array(
-    'type' => 'number', 'required' => true, 'min' => 100, 'max' => 9999999999, 'divClass' => 'oculto InmuebleEsTraspaso', 'labelClass' => 'obligat'));
   echo $this->App->horizontalSelect('Inmueble.moneda_id', '<span>[*]</span> Moneda:', $monedas, array('labelClass' => 'obligat', 'style' => 'width:96px'));
   ?>
 	<hr>
 	<?php
 	echo $this->App->horizontalInput('Inmueble.precio_venta_ini', 'Precio de venta inicial:', array('divClass' => 'oculto InmuebleEsVenta', 'disabled' => 'disabled'));
 	echo $this->App->horizontalInput('Inmueble.precio_alquiler_ini', 'Precio de renta inicial:', array('divClass' => 'oculto InmuebleEsAlquiler', 'disabled' => 'disabled'));
-	echo $this->App->horizontalInput('Inmueble.precio_traspaso_ini', 'Precio de traspaso:', array('divClass' => 'oculto InmuebleEsTraspaso', 'disabled' => 'disabled'));
 	?>
 </div>
 <!-- Gastos de comunidad -->

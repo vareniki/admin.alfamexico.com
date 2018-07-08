@@ -26,8 +26,13 @@ class HerramientasController extends AppController {
 			'TipoGaraje',
 			'TipoTerreno',
 			'TipoNave',
-			'TipoOtro'
+			'TipoOtro',
+      'InteriorExterior',
+      'EstadoConservacion'
 	);
+
+	private static $estados_conservacion = ['01' => 'a reformar', '02' => 'buen estado', '03' => 'promoción obra nueva'];
+  private static $interior_exterior = ['01' => 'exterior', '02' => 'interior', '03' => 'mixto'];
 
 	/**
 	 * @param $info
@@ -171,66 +176,113 @@ class HerramientasController extends AppController {
 	}
 
 	private function getInmueble_piso( $info ) {
+
+	  if (isset(self::$estados_conservacion[$info['Piso']['estado_conservacion_id']])) {
+      $estado_conservacion = self::$estados_conservacion[$info['Piso']['estado_conservacion_id']];
+    } else {
+      $estado_conservacion = '';
+    }
+
+    if (isset(self::$interior_exterior[$info['Piso']['interior_exterior_id']])) {
+      $interior_exterior = self::$interior_exterior[$info['Piso']['interior_exterior_id']];
+    } else {
+      $interior_exterior = '';
+    }
+
 		return array(
 				'metros'       => $info['Piso']['area_total_construida'],
 				'habitaciones' => $info['Piso']['numero_habitaciones'],
 				'bannos'       => (int) $info['Piso']['numero_banos'] + (int) $info['Piso']['numero_aseos'],
-				'parking'      => ( $info['Piso']['con_parking'] == 't' ) ? 'S' : '',
+				'parking'      => ( $info['Piso']['plazas_parking'] > 0 ) ? $info['Piso']['plazas_parking'] : '',
 				'anio'         => isset( $info['Piso']['anio_construccion'] ) ? $info['Piso']['anio_construccion'] : null,
-				'conservacion' => ( isset( $info['EstadoConservacion'] ) ) ? $info['EstadoConservacion']['description'] : '',
-				'interior'     => ( isset( $info['InteriorExterior'] ) ) ? $info['InteriorExterior']['description'] : '',
+				'conservacion' => $estado_conservacion,
+				'interior'     => $interior_exterior,
 				'ascensor'     => ( (int) $info['Piso']['numero_ascensores'] > 0 ) ? 'S' : ''
 		);
 	}
 
 	private function getInmueble_chalet( $info ) {
+
+    if (isset(self::$estados_conservacion[$info['Chalet']['estado_conservacion_id']])) {
+      $estado_conservacion = self::$estados_conservacion[$info['Chalet']['estado_conservacion_id']];
+    } else {
+      $estado_conservacion = '';
+    }
+
 		return array(
 				'metros'       => $info['Chalet']['area_total_construida'],
 				'habitaciones' => $info['Chalet']['numero_habitaciones'],
 				'bannos'       => (int) $info['Chalet']['numero_banos'] + (int) $info['Chalet']['numero_aseos'],
-				'parking'      => ( $info['Chalet']['plazas_parking'] > 0 ) ? 'S' : '',
+				'parking'      => ( $info['Chalet']['plazas_parking'] > 0 ) ? $info['Chalet']['plazas_parking'] > 0 : '',
 				'anio'         => isset( $info['Chalet']['anio_construccion'] ) ? $info['Chalet']['anio_construccion'] : null,
-				'conservacion' => ( isset( $info['EstadoConservacion'] ) ) ? $info['EstadoConservacion']['description'] : '',
-				'interior'     => ( isset( $info['InteriorExterior'] ) ) ? $info['InteriorExterior']['description'] : '',
+				'conservacion' => $estado_conservacion,
+				'interior'     => '',
 				'ascensor'     => ( $info['Chalet']['con_ascensor'] == 't' ) ? 'S' : ''
 		);
 	}
 
 	private function getInmueble_local( $info ) {
+
+    if (isset(self::$estados_conservacion[$info['Chalet']['estado_conservacion_id']])) {
+      $estado_conservacion = self::$estados_conservacion[$info['Chalet']['estado_conservacion_id']];
+    } else {
+      $estado_conservacion = '';
+    }
+
 		return array(
 				'metros'       => $info['Local']['area_total_construida'],
 				'habitaciones' => '',
 				'bannos'       => $info['Local']['numero_aseos'],
-				'parking'      => ( $info['Local']['plazas_parking'] > 0 ) ? 'S' : '',
+				'parking'      => ( $info['Local']['plazas_parking'] > 0 ) ? $info['Local']['plazas_parking'] : '',
 				'anio'         => isset( $info['Local']['anio_construccion'] ) ? $info['Local']['anio_construccion'] : null,
-				'conservacion' => ( isset( $info['EstadoConservacion'] ) ) ? $info['EstadoConservacion']['description'] : '',
+				'conservacion' => $estado_conservacion,
 				'interior'     => '',
 				'ascensor'     => ''
 		);
 	}
 
 	private function getInmueble_oficina( $info ) {
+
+    if (isset(self::$estados_conservacion[$info['Oficina']['estado_conservacion_id']])) {
+      $estado_conservacion = self::$estados_conservacion[$info['Oficina']['estado_conservacion_id']];
+    } else {
+      $estado_conservacion = '';
+    }
+
+    if (isset(self::$interior_exterior[ $info['Oficina']['interior_exterior_id']])) {
+      $interior_exterior = self::$interior_exterior[$info['Oficina']['interior_exterior_id']];
+    } else {
+      $interior_exterior = '';
+    }
+
 		return array(
 				'metros'       => $info['Oficina']['area_total_construida'],
 				'habitaciones' => $info['Oficina']['numero_habitaciones'],
 				'bannos'       => (int) $info['Oficina']['numero_banos'] + (int) $info['Oficina']['numero_aseos'],
-				'parking'      => ( $info['Oficina']['plazas_parking'] > 0 ) ? 'S' : '',
+				'parking'      => ( $info['Oficina']['plazas_parking'] > 0 ) ? $info['Oficina']['plazas_parking'] : '',
 				'anio'         => isset( $info['Oficina']['anio_construccion'] ) ? $info['Oficina']['anio_construccion'] : null,
-				'conservacion' => ( isset( $info['EstadoConservacion'] ) ) ? $info['EstadoConservacion']['description'] : '',
-				'interior'     => ( isset( $info['InteriorExterior'] ) ) ? $info['InteriorExterior']['description'] : '',
+				'conservacion' => $estado_conservacion,
+				'interior'     => $interior_exterior,
 				'ascensor'     => ( $info['Oficina']['numero_ascensores'] > 0 ) ? 'S' : ''
 
 		);
 	}
 
 	private function getInmueble_nave( $info ) {
+
+    if (isset(self::$estados_conservacion[$info['Nave']['estado_conservacion_id']])) {
+      $estado_conservacion = self::$estados_conservacion[$info['Nave']['estado_conservacion_id']];
+    } else {
+      $estado_conservacion = '';
+    }
+
 		return array(
 				'metros'       => $info['Nave']['area_total_construida'],
 				'habitaciones' => '',
 				'bannos'       => $info['Nave']['numero_aseos'],
-				'parking'      => ( $info['Nave']['plazas_parking'] > 0 ) ? 'S' : '',
+				'parking'      => ( $info['Nave']['plazas_parking'] > 0 ) ? $info['Nave']['plazas_parking'] : '',
 				'anio'         => isset( $info['Nave']['anio_construccion'] ) ? $info['Nave']['anio_construccion'] : null,
-				'conservacion' => ( isset( $info['EstadoConservacion'] ) ) ? $info['EstadoConservacion']['description'] : '',
+				'conservacion' => $estado_conservacion,
 				'interior'     => '',
 				'ascensor'     => ''
 		);
@@ -245,8 +297,7 @@ class HerramientasController extends AppController {
 				'anio'         => '',
 				'conservacion' => '',
 				'interior'     => '',
-				'ascensor'     => '',
-				'certificado'  => ''
+				'ascensor'     => ''
 		);
 	}
 
@@ -259,8 +310,7 @@ class HerramientasController extends AppController {
 				'anio'         => '',
 				'conservacion' => '',
 				'interior'     => '',
-				'ascensor'     => '',
-				'certificado'  => ''
+				'ascensor'     => ''
 		);
 	}
 
@@ -273,8 +323,7 @@ class HerramientasController extends AppController {
 				'anio'         => '',
 				'conservacion' => '',
 				'interior'     => '',
-				'ascensor'     => '',
-				'certificado'  => ''
+				'ascensor'     => ''
 		);
 	}
 
@@ -324,17 +373,15 @@ class HerramientasController extends AppController {
 
 		$agencia = $this->viewVars['agencia']['Agencia'];
 
-		$fields = array(
+		$fields = [
 				'Inmueble.id',
 				'Inmueble.tipo_inmueble_id',
 				'Inmueble.numero_agencia',
 				'Inmueble.codigo',
 				'Inmueble.es_venta',
 				'Inmueble.es_alquiler',
-				'Inmueble.es_traspaso',
 				'Inmueble.precio_venta',
 				'Inmueble.precio_alquiler',
-				'Inmueble.precio_traspaso',
 				'Inmueble.nombre_calle',
 				'Inmueble.numero_calle',
 				'Inmueble.codigo_postal',
@@ -349,6 +396,7 @@ class HerramientasController extends AppController {
 				'Inmueble.llaves',
 				'Inmueble.estado_inmueble_id',
 				'Inmueble.tipo_contrato_id',
+				'Inmueble.modified',
 
 				'Piso.area_total_construida',
 				'Piso.numero_habitaciones',
@@ -361,7 +409,6 @@ class HerramientasController extends AppController {
 				'Piso.tipo_piso_id',
 
 				'Piso.estado_conservacion_id',
-
 				'Piso.interior_exterior_id',
 
 				'Chalet.area_total_construida',
@@ -372,21 +419,20 @@ class HerramientasController extends AppController {
 				'Chalet.anio_construccion',
 				'Chalet.con_ascensor',
 				'Chalet.tipo_chalet_id',
-
 				'Chalet.estado_conservacion_id',
 
 				'Local.area_total_construida',
 				'Local.numero_aseos',
 				'Local.plazas_parking',
 				'Local.anio_construccion',
-
+        'Local.tipo_local_id',
 				'Local.estado_conservacion_id',
 
 				'Nave.area_total_construida',
 				'Nave.numero_aseos',
 				'Nave.plazas_parking',
 				'Nave.anio_construccion',
-
+        'Nave.tipo_nave_id',
 				'Nave.estado_conservacion_id',
 
 				'Oficina.area_total_construida',
@@ -408,6 +454,7 @@ class HerramientasController extends AppController {
 				'Terreno.area_total',
 
 				'Otro.area_total',
+				'Otro.tipo_otro_id',
 
 				'TipoInmueble.id',
 				'TipoInmueble.description',
@@ -416,18 +463,20 @@ class HerramientasController extends AppController {
 				'Inmueble.zona',
 
 				'Propietario.nombre_contacto',
-				'Propietario.telefono1_contacto'
-		);
+				'Propietario.telefono1_contacto',
+        'Propietario.email_contacto',
 
-		$inmuebles = $this->Inmueble->find( 'all', array(
+        'Agente.nombre_contacto'
+		];
+
+		$inmuebles = $this->Inmueble->find( 'all', [
 				'fields'     => $fields,
-				'conditions' => array(
-						'Inmueble.agencia_id' => $agencia['id'],
-						'Inmueble.fecha_baja' => null
-				),
+				'conditions' => [
+						'Inmueble.agencia_id' => $agencia['id']
+				],
 				'recursive'  => 1,
 				'callbacks'  => false
-		) );
+		] );
 
 		foreach ( $inmuebles as $inm ) {
 
@@ -451,15 +500,16 @@ class HerramientasController extends AppController {
 
 			// Portales
 			$portales = '';
+			$portalesArray = [];
 			if ( ! empty( $inm['Portal'] ) ) {
 				foreach ( $inm['Portal'] as $portal ) {
-					$portales[] = $portal['description'];
+          $portalesArray[] = $portal['description'];
 				}
-				$portales = implode( ', ', $portales );
+				$portales = implode( ', ', $portalesArray );
 			}
 
 			$getInmuebleInfo = 'getInmueble_' . strtolower( $subtipoClass );
-			$info            = $this->{$getInmuebleInfo}( $inm );
+			$info  = $this->{$getInmuebleInfo}( $inm );
 
 			$info = array(
 					$inm['Inmueble']['numero_agencia'] . '-' . $inm['Inmueble']['codigo'],
@@ -479,6 +529,7 @@ class HerramientasController extends AppController {
 					$info['ascensor'],
 					$inm['Propietario']['nombre_contacto'],
 					$inm['Propietario']['telefono1_contacto'],
+					$inm['Propietario']['email_contacto'],
 					( isset( $inm['Agente']['nombre_contacto'] ) ) ? $inm['Agente']['nombre_contacto'] : '',
 					$inm['EstadoInmueble']['description'],
 					$inm['Inmueble']['fecha_captacion'],
@@ -487,7 +538,8 @@ class HerramientasController extends AppController {
 					$inm['Inmueble']['honor_agencia'],
 					$inm['Inmueble']['numero_agencia'],
 					$inm['Inmueble']['llaves'],
-					$portales
+					$portales,
+          $inm['Inmueble']['modified']
 			);
 
 			foreach ( $info as $key => $value ) {
@@ -515,7 +567,8 @@ class HerramientasController extends AppController {
 				'Interior/exterior',
 				'Ascensor',
 				'Propietario',
-				'móvil',
+				'Móvil',
+        'Email',
 				'Agente',
 				'Estado',
 				'Fecha de captación',
@@ -524,7 +577,8 @@ class HerramientasController extends AppController {
 				'Honorarios',
 				'Oficina',
 				'Llaves',
-				'Portales'
+				'Portales',
+        'Modificado'
 		);
 
 		$this->viewClass = 'CsvView.Csv';
@@ -550,6 +604,7 @@ class HerramientasController extends AppController {
 					$dem['Demandante']['referencia'],
 					$dem['Demandante']['nombre_contacto'],
 					$dem['Demandante']['telefono1_contacto'] . ( ( ! empty( $dem['Demandante']['telefono2_contacto'] ) ) ? ' / ' . $dem['Demandante']['telefono2_contacto'] : '' ),
+          $dem['Demandante']['email_contacto'],
 					( $dem['Agente']['nombre_contacto'] != null ) ? $dem['Agente']['nombre_contacto'] : '',
 					( ! empty( $dem['Demanda']['TipoInmueble'] ) ) ? $dem['Demanda']['TipoInmueble']['description'] : '',
 					( ! empty( $dem['Demanda']['subtipo'] ) ) ? $this->getDemSubtipoInmueble( $dem['Demanda']['tipo'], $dem['Demanda']['subtipo'] ) : '',
@@ -574,6 +629,7 @@ class HerramientasController extends AppController {
 				'Referencia',
 				'Demandante',
 				'Móvil',
+				'Email',
 				'Agente',
 				'Tipo',
 				'Subtipo',

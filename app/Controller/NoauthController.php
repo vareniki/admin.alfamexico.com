@@ -6,154 +6,189 @@
  * Date: 16/04/14
  * Time: 09:39
  */
-class NoAuthController extends Controller {
 
-	public $uses = array( 'Documento', 'Inmueble' );
+define('IMAGEN_X', 1280);
 
-	public $helpers = array( 'Inmuebles' );
+class NoauthController extends Controller {
 
-	private static $tiposInmueble = array(
-			'01' => 'departamento',
-			'02' => 'casa',
-			'03' => 'local',
-			'04' => 'oficina',
-			'05' => 'estacionamiento',
-			'06' => 'terreno',
-			'07' => 'nave',
-			'08' => 'otro'
-	);
+  public $uses = array( 'Documento', 'Inmueble' );
 
-	private static $calidadPrecio = array(
-			'01' => 'muy bien',
-			'02' => 'normal',
-			'03' => 'caro'
-	);
+  public $helpers = array( 'Inmuebles' );
 
-	function beforeFilter() {
-		Configure::load( 'alfainmo' );
-		App::import( 'Vendor', 'ImageTool' );
-	}
+  private static $tiposInmueble = array(
+      '01' => 'departamento',
+      '02' => 'casa',
+      '03' => 'local',
+      '04' => 'oficina',
+      '05' => 'estacionamiento',
+      '06' => 'terreno',
+      '07' => 'nave',
+      '08' => 'otro'
+  );
 
-	/**
-	 * @param string $tam
-	 * @param null $img
-	 *
-	 * @return int
-	 */
-	public function image( $tam = 'm', $img = null ) {
+  private static $calidadPrecio = array(
+      '01' => 'muy bien',
+      '02' => 'normal',
+      '03' => 'caro'
+  );
 
-		$config = Configure::read( 'alfainmo' );
-		$folder = $config ['images.path'];
+  function beforeFilter() {
+    Configure::load( 'alfainmo' );
+    App::import( 'Vendor', 'ImageTool' );
+  }
 
-		$watermark = strlen( $tam ) == 2 && substr( $tam, 1, 1 ) == 'w';
+    private function createThumb($origFile, $thumbFile, $thumbWidth) {
 
-		if ( strlen( $tam ) >= 2 ) {
-			$tam = substr( $tam, 0, 1 );
-		}
+      $img = imagecreatefromjpeg($origFile);
+      $width = imagesx($img);
+      $height = imagesy($img);
 
-		$this->layout     = null;
-		$this->autoRender = false;
+      $new_width = $thumbWidth;
+      $new_height = floor($height * ( $thumbWidth / $width ));
 
-		$pref = ( $tam != 'o' ) ? $tam . '_' : '';
+      $tmp_img = imagecreatetruecolor($new_width, $new_height);
+      imagecopyresized($tmp_img, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+      imagejpeg($tmp_img, $thumbFile);
+    }
 
-		if ( $img == null ) {
+  /**
+   * @param string $tam
+   * @param null $img
+   *
+   * @return int
+   */
+  public function image( $tam = 'm', $img = null ) {
 
-			header( 'Content-Type: image/png' );
-			$this->response->type( 'image/png' );
+    $config = Configure::read( 'alfainmo' );
+    $folder = $config ['images.path'];
 
-			return readfile( $folder . $pref . 'sin_fotos.png' );
+    $watermark = strlen( $tam ) == 2 && substr( $tam, 1, 1 ) == 'w';
 
-		} else {
+    if ( strlen( $tam ) >= 2 ) {
+      $tam = substr( $tam, 0, 1 );
+    }
 
-			$img = str_replace( '|', '/', $img );
-			$ext = pathinfo( $img, PATHINFO_EXTENSION );
+    $this->layout     = null;
+    $this->autoRender = false;
 
-			$path = pathinfo( $img, PATHINFO_DIRNAME );
-			if ( $path == '.' ) {
-				$path = '';
-			}
+    $pref = ( $tam != 'o' ) ? $tam . '_' : '';
 
-			$basename = pathinfo( $img, PATHINFO_BASENAME );
-			$file     = $folder . $path . DIRECTORY_SEPARATOR . $pref . $basename;
+    if ( $img == null ) {
 
-			if ( file_exists( $file ) ) {
+      header( 'Content-Type: image/png' );
+      $this->response->type( 'image/png' );
 
-				header( "Content-Type: image/$ext" );
-				$this->response->type( "image/$ext" );
+      return readfile( $folder . $pref . 'sin_fotos.png' );
 
-				if ( $watermark ) {
-					$gd = ImageTool::watermark( array(
-							'input'     => $file,
-							'watermark' => 'img/watermark.png',
-							'opacity'   => '15'
-					) );
+    } else {
 
-					ob_start();
-					imagepng( $gd );
-					$result = ob_get_clean();
-				} else {
-					$result = readfile( $file );
-				}
+      $img = str_replace( '|', '/', $img );
+      $img = str_replace( '--', '/', $img );
+      $ext = pathinfo( $img, PATHINFO_EXTENSION );
 
-				return $result;
+      $path = pathinfo( $img, PATHINFO_DIRNAME );
+      if ( $path == '.' ) {
+        $path = '';
+      }
 
-			} else {
+      $basename = pathinfo( $img, PATHINFO_BASENAME );
+      $file = $folder . $path . DIRECTORY_SEPARATOR . $pref . $basename;
+      $file_wm = $folder . $path . DIRECTORY_SEPARATOR . $pref . 'wm_' . $basename;
+      $orig_file = $folder . $path . DIRECTORY_SEPARATOR . $basename;
 
-				header( 'Content-Type: image/png' );
-				$this->response->type( 'image/png' );
+      if (!file_exists($file) && file_exists($orig_file) && $pref == 'x_') {
+        $this->createThumb($orig_file, $file, IMAGEN_X);
+      }
 
-				return readfile( $folder . $pref . 'sin_fotos.png' );
-			}
-		}
-	}
+      if ( file_exists($file) ) {
 
-	/**
-	 * @param $id
-	 * @param $inmuebleId
-	 *
-	 * @return int
-	 */
-	public function document( $id, $inmuebleId ) {
+        header( "Content-Type: image/$ext" );
+        $this->response->type( "image/$ext" );
 
-		$doc = $this->Documento->find( 'first', array(
-				'conditions' => array(
-						'Documento.id'          => $id,
-						'Documento.inmueble_id' => $inmuebleId
-				)
-		) );
-		if ( empty( $doc ) ) {
-			return;
-		}
+        if ( $watermark ) {
 
-		$config = Configure::read( 'alfainmo' );
+          if (file_exists($file_wm) && filemtime($file_wm) < filemtime($file)) {
+            unlink($file_wm);
+          }
 
-		$doc_path = $config['documents.path'] . $doc['Documento']['path'] . DIRECTORY_SEPARATOR;
-		$doc_name = $doc['Documento']['fichero'];
+          if (!file_exists($file_wm)) {
 
-		$this->layout     = null;
-		$this->autoRender = false;
+            ImageTool::watermark([
+                'input' => $file,
+                'output' => $file_wm,
+                'watermark' => 'img/watermark.png',
+                'opacity'   => '15'
+            ]);
+          }
 
-		header( 'Content-Type: ' . $doc['Documento']['tipo'] );
-		header( 'Content-Disposition: attachment; filename="' . $doc['Documento']['nombre'] . '"' );
+          if (file_exists($file_wm)) {
+            $result = readfile($file_wm);
+          } else {
+            $result = readfile($file);
+          }
 
-		//$this->response->type('application/octet-stream');
+        } else {
+          $result = readfile($file);
+        }
+        return $result;
 
-		return readfile( $doc_path . $doc_name );
-	}
+      } else {
 
-	/**
-	 * @param $id
-	 */
-	public function inmueble( $id ) {
-		// Llama a la función específica en función del tipo de inmueble actual
-		$this->layout = null;
-		//$this->autoRender = false;
+        header( 'Content-Type: image/png' );
+        $this->response->type( 'image/png' );
 
-		$info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
-		$this->set( 'info', $info );
+        return readfile( $folder . $pref . 'sin_fotos.png' );
+      }
+    }
+  }
 
-		$tipoInmueble = self::$tiposInmueble[ $info['Inmueble']['tipo_inmueble_id'] ];
-		$this->set( 'tipoInmueble', $tipoInmueble );
-		$this->set( 'calidadPrecio', self::$calidadPrecio );
-	}
+  /**
+   * @param $id
+   * @param $inmuebleId
+   *
+   * @return int
+   */
+  public function document( $id, $inmuebleId ) {
+
+    $doc = $this->Documento->find( 'first', array(
+        'conditions' => array(
+            'Documento.id'          => $id,
+            'Documento.inmueble_id' => $inmuebleId
+        )
+    ) );
+    if ( empty( $doc ) ) {
+      return;
+    }
+
+    $config = Configure::read( 'alfainmo' );
+
+    $doc_path = $config['documents.path'] . $doc['Documento']['path'] . DIRECTORY_SEPARATOR;
+    $doc_name = $doc['Documento']['fichero'];
+
+    $this->layout     = null;
+    $this->autoRender = false;
+
+    header( 'Content-Type: ' . $doc['Documento']['tipo'] );
+    header( 'Content-Disposition: attachment; filename="' . $doc['Documento']['nombre'] . '"' );
+
+    //$this->response->type('application/octet-stream');
+
+    return readfile( $doc_path . $doc_name );
+  }
+
+  /**
+   * @param $id
+   */
+  public function inmueble( $id ) {
+    // Llama a la función específica en función del tipo de inmueble actual
+    $this->layout = null;
+    //$this->autoRender = false;
+
+    $info = $this->Inmueble->find( 'first', array( 'conditions' => array( 'Inmueble.id' => $id ), 'recursive' => 2 ) );
+    $this->set( 'info', $info );
+
+    $tipoInmueble = self::$tiposInmueble[ $info['Inmueble']['tipo_inmueble_id'] ];
+    $this->set( 'tipoInmueble', $tipoInmueble );
+    $this->set( 'calidadPrecio', self::$calidadPrecio );
+  }
 } 

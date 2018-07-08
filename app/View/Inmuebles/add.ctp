@@ -12,10 +12,7 @@ $this->end();
 $this->start('header');
 ?>
 <script type="text/javascript">
-  var $traspasoCheck;
   $(document).ready(function() {
-    $traspasoCheck = $("#InmuebleEsTraspaso").closest("label");
-    $traspasoCheck.hide();
 
     $("[rel=popover]").popover({'trigger': 'hover', 'html': true});
     $("#addForm").validate({
@@ -30,21 +27,13 @@ $this->start('header');
       $("div." + this.id).show();
 
       $("#tipoOperacion input[type=checkbox]").prop("checked", false);
-
-      if (this.value == '03' || this.value == '04' || this.value == '07') {
-        $traspasoCheck.show();
-      } else {
-        $("#InmuebleEsTraspaso").prop("checked", false);
-        $traspasoCheck.hide();
-        $(".InmuebleEsTraspaso").hide();
-      }
     });
 
-	  $("#PisoEsVpo, #ChaletEsVpo").on("click", function() {
-		  if ($(this).is(":checked")) {
-			  alert("Este inmueble es de VPO, para que se publicite en Web, es necesario que nos enviéis la autorización de venta y el precio del módulo.");
-		  }
-	  });
+      $("#PisoEsVpo, #ChaletEsVpo").on("click", function() {
+          if ($(this).is(":checked")) {
+              alert("Este inmueble es de VPO, para que se publicite en Web, es necesario que nos enviéis la autorización de venta y el precio del módulo.");
+          }
+      });
 
     $("#tipoOperacion").on("click", "input[type=checkbox]", function() {
       $("div[class*=InmuebleEs]").hide();
@@ -53,8 +42,6 @@ $this->start('header');
         visibles += ",.InmuebleEsVenta";
       if ($("#InmuebleEsAlquiler").is(":checked"))
         visibles += ",.InmuebleEsAlquiler";
-      if ($("#InmuebleEsTraspaso").is(":checked"))
-        visibles += ",.InmuebleEsTraspaso";
 
       if (visibles != "") {
         visibles = visibles.substr(1);
@@ -92,7 +79,7 @@ echo $this->Form->hidden('Inmueble.numero_agencia', array('value' => $agencia['A
 
 echo $this->App->horizontalRadio('Inmueble.tipo_inmueble_id', '<span>[*]</span> Tipo de inmueble:', $tiposInmueble, array('required' => 'true'));
 echo $this->App->horizontalRadio('Piso.tipo_piso_id', '<span>[*]</span> Tipo de piso:', $tiposPiso, array('required' => 'true', 'divClass' => 'oculto InmuebleTipoInmuebleId01'));
-echo $this->App->horizontalRadio('Chalet.tipo_chalet_id', '<span>[*]</span> Tipo de chalet:', $tiposChalet, array('required' => 'true', 'divClass' => 'oculto InmuebleTipoInmuebleId02'));
+echo $this->App->horizontalRadio('Chalet.tipo_chalet_id', '<span>[*]</span> Tipo de casa:', $tiposChalet, array('required' => 'true', 'divClass' => 'oculto InmuebleTipoInmuebleId02'));
 echo $this->App->horizontalRadio('Local.tipo_local_id', '<span>[*]</span> Tipo de local:', $tiposLocal, array('required' => 'true', 'divClass' => 'oculto InmuebleTipoInmuebleId03'));
 echo $this->App->horizontalRadio('Oficina.tipo_oficina_id', '<span>[*]</span> Tipo de oficina:', $tiposOficina, array('required' => 'true', 'divClass' => 'oculto InmuebleTipoInmuebleId04'));
 echo $this->App->horizontalRadio('Garaje.tipo_garaje_id', '<span>[*]</span> Tipo de garaje:', $tiposGaraje, array('required' => 'true', 'divClass' => 'oculto InmuebleTipoInmuebleId05'));
@@ -107,7 +94,6 @@ echo $this->App->horizontalRadio('Otro.tipo_otro_id', '<span>[*]</span> Tipo pro
     <?php
     echo $this->Form->checkbox('Inmueble.es_venta', array('value' => 't', 'label' => 'venta'));
     echo $this->Form->checkbox('Inmueble.es_alquiler', array('value' => 't', 'label' => 'renta'));
-    echo $this->Form->checkbox('Inmueble.es_traspaso', array('value' => 't', 'label' => 'traspaso'));
     echo '<br>';
     echo $this->Form->checkbox('Inmueble.es_promocion', array('value' => 't', 'label' => 'desarrollo'));
     ?>
@@ -120,15 +106,13 @@ echo $this->App->horizontalInput('Inmueble.nombre_promocion', '<span>[*]</span> 
 echo $this->App->horizontalInput('Inmueble.entrega_promocion', 'Entrega aproximada:', array(
   'type' => 'text', 'maxlength' => 64, 'placeholder' => 'escriba una fecha aproximada de entrega', 'divClass' => 'oculto divEsPromocion'));
 ?>
-<div class="oculto InmuebleEsVenta InmuebleEsAlquiler InmuebleEsTraspaso">
+<div class="oculto InmuebleEsVenta InmuebleEsAlquiler">
   <br>
   <?php
   echo $this->App->horizontalInput('Inmueble.precio_venta', '<span>[*]</span> Precio de venta:', array(
     'type' => 'number', 'required' => true, 'min' => 100, 'max' => 9999999999, 'divClass' => 'oculto InmuebleEsVenta'));
   echo $this->App->horizontalInput('Inmueble.precio_alquiler', '<span>[*]</span> Precio de renta:', array(
     'type' => 'number', 'required' => true, 'min' => 10, 'max' => 9999999, 'divClass' => 'oculto InmuebleEsAlquiler'));
-  echo $this->App->horizontalInput('Inmueble.precio_traspaso', '<span>[*]</span> Precio de traspaso:', array(
-    'type' => 'number', 'required' => true, 'min' => 100, 'max' => 9999999999, 'divClass' => 'oculto InmuebleEsTraspaso'));
 
   echo $this->App->horizontalSelect('Inmueble.moneda_id', '<span>[*]</span> Moneda:', $monedas, array('style' => 'width:96px'));
   ?>

@@ -21,7 +21,7 @@ echo $this->App->horizontalInput('Oficina.numero_banos', 'Ba&ntilde;os:', array(
 echo $this->App->horizontalInput('Oficina.numero_aseos', 'Medios ba&ntilde;os:', array('min' => 0, 'max' => 99, 'maxlength' => 2));
 echo '<br>';
 echo $this->App->horizontalInput('Oficina.plazas_parking', 'Plazas de parking:', array('min' => 0, 'max' => 99, 'maxlength' => 3));
-echo $this->App->horizontalInput('Oficina.anio_construccion', 'A&ntilde;o de construcci&oacute;n:', array('maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat'));
+echo $this->App->horizontalInput('Oficina.anio_construccion', 'A&ntilde;o de construcci&oacute;n (ej. 2015):', ['min' => 1000, 'max' => '2999', 'maxlength' => 4, 'datalist' => 'aniosList', 'type' => 'text', 'labelClass' => 'obligat']);
 echo $this->App->horizontalSelect('Oficina.estado_conservacion_id', 'Estado de conservaci&oacute;n:', $estadosConservacion, array('size' => 3, 'labelClass' => 'obligat'));
 echo $this->App->horizontalSelect('Oficina.interior_exterior_id', 'Interior / exterior:', $interiorExterior, array('size' => 3, 'empty' => true));
 

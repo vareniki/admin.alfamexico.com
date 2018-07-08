@@ -21,7 +21,7 @@ class AgenciasInfoComponent extends SessionComponent {
 	      } else {
 		      $subcond[]['Agencia.nombre_agencia ILIKE'] = "%$q%";
 		      $subcond[]['Agencia.poblacion ILIKE'] = "%$q%";
-		      $subcond[]['Agencia.provincia ILIKE'] = "%$q%";
+		      $subcond[]['Provincia.description ILIKE'] = "%$q%";
 		      $subcond[]['Agencia.telefono1_contacto ILIKE'] = "%$q%";
 		      $subcond[]["Agencia.observaciones ILIKE"] = "%$q%";
 		      $conditions[]['OR'] = $subcond;
